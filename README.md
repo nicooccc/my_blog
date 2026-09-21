@@ -33,7 +33,7 @@
 # [计算机网络](/计算机网络/计算机网络.md)
 
 
-# [Cisco Packet Tracer](<Cisco packet trace/trace.md>)
+# [Cisco Packet Tracer](<Cisco_packet_trace/trace.md>)
 
 # [计算机系统基础](计算机系统基础/计算机系统.md)
 
