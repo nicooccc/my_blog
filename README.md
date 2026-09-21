@@ -30,14 +30,3 @@
 [CISCO网址](https://www.netacad.com/)  
 账号2273846642@qq.com  
 密码Zyc123456.  
-# [计算机网络](/计算机网络/计算机网络.md)
-
-
-# [Cisco Packet Tracer](<Cisco_packet_trace/trace.md>)
-
-# [计算机系统基础](计算机系统基础/计算机系统.md)
-
-# [思科网院](思科网院/netacad.md)
-
-# [微信小程序开发](微信小程序开发/小程序开发.md)
-
