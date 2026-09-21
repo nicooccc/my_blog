@@ -28,5 +28,8 @@
 ![小徐课2](./images/day1_1.jpg)  
 ![小徐课1](./images/day1_2.jpg)  
 [CISCO网址](https://www.netacad.com/)  
-账号2273846642@qq.com  
-密码Zyc123456.  
+```bash
+    git add .
+    git commit -m "更新了禁用顶部导航栏"
+    git push
+```
