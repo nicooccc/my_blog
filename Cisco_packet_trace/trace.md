@@ -50,8 +50,17 @@ WAN广域网：由多lan组成
 
 ```bash
     configure terminal //进入全局配置界面
-    eixt //返回特权
+    eixt //返回上一级
     line console 0 //进入子路配置模式
     end //返回到普通模式
+    ctrl + Z
 ```
 ![alt text](image-13.png)
+
+## 基本的IOS命令结构
+
+![alt text](image-14.png)
+
+## Cli的指令热键
+
+![alt text](image-15.png)
