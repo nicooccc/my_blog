@@ -30,7 +30,7 @@
 [CISCO网址](https://www.netacad.com/)  
 ```bash
     git add .
-    git commit -m "更新DAY4"
+    git commit -m "更新DAY5"
     git push
 ```  
     1  
@@ -49,4 +49,4 @@
     8192  
     16384  
 15     32768
-16     65536 
+16     65536  

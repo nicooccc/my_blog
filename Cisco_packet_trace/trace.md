@@ -64,3 +64,28 @@ WAN广域网：由多lan组成
 ## Cli的指令热键
 
 ![alt text](image-15.png)
+
+## 设备名称
+
+- 以数字开头
+- 不包含空格
+- 以字母或数字结尾
+- 仅使用字母，数字和波折号
+- 小于64字符
+### 配置密码
+```bash
+    hostname newname //修改名字在全局配置下
+    password 密码
+    login
+    end
+```
+![alt text](image-16.png)
+![alt text](image-17.png)
+    enable sercet password //设置进入enable的密码·
+```bash
+    service password-encryption //加密密码
+```
+
+### 横幅消息
+    banner motd #xxx内容#
+
