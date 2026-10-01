@@ -30,7 +30,7 @@
 [CISCO网址](https://www.netacad.com/)  
 ```bash
     git add .
-    git commit -m "更新DAY5"
+    git commit -m "更新DAY6"
     git push
 ```  
     1  
