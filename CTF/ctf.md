@@ -3,6 +3,22 @@
     [navisec](https://navisec.io/)
     [渗透师](https://www.shentoushi.top/)
 
+
+## 工具
+    binwalk  
+    file  
+    zsteg  
+    010editor
+    zbarimg xxx.png //扫码工具
+![alt text](image-31.png)
+Base64 特征：字符集 A-Z a-z 0-9 + /，末尾常有 = 填充。
+Base32 特征：字符集 A-Z 2-7，通常全大写，长度是 8 的倍数，末尾常有 =。
+URL Safe Base64：把 + / 换成 - _，解码前先替换：
+```bash
+    echo "你的字符串" | tr '_-' '/+' | base64 -d
+```
+    在线网址：http://www.hiencode.com/base64.html
+循环反复尝试 base64 / base32。
 ## 基本赛制与题型  
     题目 ---》 flag ---> 分数 ---》名次
     i春秋，e春秋
@@ -34,9 +50,8 @@
 # 软件
     vm，bp
     kalilinux:已经安装了很多的软件和工具
-## 已下载火狐延长版
 ```bash
-    firefox-esr
+    firefox-esr //狐火
 ```
 
 # 杂项的解题思路
@@ -134,3 +149,81 @@
 - F5
 ### 遇到打开是乱码的用16进制查看器
 
+### 总结
+
+🧭 第一步：通用排查（适用于所有图片）
+不管拿到什么图片，先用这几招过一遍，能筛掉一半的题：
+
+看真实类型：file 文件名。如果提示是 PNG 但后缀是 JPG，或者提示是 ZIP、RAR，直接改后缀或按相应格式处理（常有“图种”或修改文件头）.
+
+搜关键字：strings 文件名 | grep -i 'flag\|ctf\|key'。很多简单题直接把 flag 写在二进制数据里。
+
+看元数据（EXIF）：exiftool 文件名 或 exiv2 文件名。常有 Comment 字段、拍摄地点、相机型号里藏 flag。
+
+分离附加文件：binwalk -e 文件名 或 foremost 文件名。看看图片尾部是不是拼接了 ZIP、PNG，提取出来。
+
+十六进制查看：xxd 文件名 | head 或 xxd 文件名 | tail。看头部是否被修改（比如 PNG 头被改了），或者尾部是否有追加数据。
+
+🖼️ 第二步：按后缀精准打击
+1. JPG / JPEG 后缀
+JPG 是有损压缩，不适合做 LSB 隐写，所以常见的套路是“加密隐写”。
+
+主力工具：steghide / stegseek
+
+解题步骤：
+
+尝试无密码提取：steghide extract -sf 文件.jpg
+
+如果提示需要密码，直接用 stegseek 爆破解密：
+stegseek --crack -sf 文件.jpg -wl /usr/share/wordlists/rockyou.txt
+
+如果 stegseek 没结果，尝试 stegseek --seed 文件.jpg 检测是否根本不是 steghide。
+
+其他怪招：outguess、jphide、F5 隐写（需要专门的检测工具，如之前提过的 stegdetect，但成功率低，建议先用 stegseek）。
+
+2. PNG 后缀
+PNG 无损压缩，是 LSB（最低有效位）隐写的重灾区，也是 CTF 最爱考的格式。
+
+主力工具：zsteg、Stegsolve、pngcheck
+
+解题步骤：
+
+LSB 扫描：zsteg -a 文件.png。它会列出所有可疑通道，如果看到字符串或 PK 头（ZIP文件头），用 zsteg -E "通道名" 文件.png > output 提取。
+
+图形化分析：运行 java -jar stegsolve.jar，使用 Analyse -> Data Extract 勾选 Red/Green/Blue 的 0 位，看能不能看到清晰的二维码或字符串；或者用 Frame Browser 查看帧（动图）。
+
+结构检查：pngcheck -v 文件.png。如果提示 CRC error（CRC 校验错误），说明宽高被修改过，或者 IDAT 数据块被篡改。
+
+宽高修改（高频考点）：如果图片显示不全，用 Python 脚本爆破/修改 IHDR 块里的宽和高，并修复 CRC 值。
+
+双图对比：两张图片长得很像，大概率是“盲水印”。需要用到 blind-watermark 等脚本或者在线工具。
+
+3. BMP 后缀
+BMP 是未压缩格式，体积大，也常用来做 LSB 隐写。
+
+主力工具：zsteg、Stegsolve、wbStego
+
+解题步骤：
+
+直接上 zsteg -a 文件.bmp，经常能扫出 LSB 数据。
+
+如果是调色板隐写（Palette-based），需要写 Python 脚本（用 PIL 库）读取调色板顺序，或者用 Stegsolve 的 Colour Palette 功能查看。
+
+有时候是 wbStego 加密，如果 zsteg 没结果，可以尝试用 stegseek（它也支持 BMP）。
+
+4. GIF 后缀
+GIF 是动图，核心考点在多帧和调色板。
+
+主力工具：Stegsolve、ffmpeg、identify
+
+解题步骤：
+
+分帧：用 ffmpeg -i 文件.gif frame_%d.png 或 convert 文件.gif frame_%d.png 把每一帧切出来，逐一查看是否有隐藏文字或残缺二维码。
+
+帧时间隐写：有些题目把 flag 的二进制写在了每一帧的延时时间（帧间隔）里。需要用 identify -format "%T\n" 文件.gif 获取每帧延时，然后把 10ms/20ms 转换成 0/1 再转 ASCII。
+
+
+
+调色板隐写：同 BMP。
+
+Stegsolve 帧浏览：在 Stegsolve 里用 Frame Browser 可以逐帧查看，非常方便。
