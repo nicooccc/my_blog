@@ -18,7 +18,7 @@ URL Safe Base64：把 + / 换成 - _，解码前先替换：
     echo "你的字符串" | tr '_-' '/+' | base64 -d
 ```
     在线网址：http://www.hiencode.com/base64.html
-循环反复尝试 base64 / base32。
+    循环反复尝试 base64 / base32。
 ## 基本赛制与题型  
     题目 ---》 flag ---> 分数 ---》名次
     i春秋，e春秋
@@ -125,6 +125,31 @@ URL Safe Base64：把 + / 换成 - _，解码前先替换：
 - 尾修复
 - crc循环效验修复
 - 长宽高修复
+![alt text](image-34.png)
+```python
+import zlib
+import struct
+
+filename = "图片名.png"
+# 读取文件数据
+with open(filename, 'rb') as f:
+    data = bytearray(f.read())
+
+# PNG 的 IHDR 块从第 16 字节开始，宽 4 字节，高 4 字节
+# 利用已知 CRC 来爆破高度（因为修改宽高会导致 CRC 校验失败，我们反过来利用 CRC 去猜高度）
+crc32_expected = struct.unpack(">I", data[29:33])[0] # 原始 CRC
+
+for h in range(1, 2000): # 假设高度在 2000 以内
+    # 修改高度字段
+    data[20:24] = struct.pack(">I", h)
+    # 计算新的 CRC (PNG 的 CRC 是根据 "IHDR" + 宽 + 高 + 位深 + 颜色类型 + 压缩 + 过滤 + 隔行扫描 计算的)
+    crc32_calc = zlib.crc32(data[12:29]) & 0xffffffff
+    if crc32_calc == crc32_expected:
+        print(f"找到正确高度: {h}")
+        with open("fixed.png", "wb") as f:
+            f.write(data)
+        break
+```
 ### 最低位有效位LSB隐写
     Stegslove可以用来处理LSB隐写，在DATA EXact中
     对于图像的RGB有8位，把信息隐藏在最后一位
@@ -196,34 +221,51 @@ LSB 扫描：zsteg -a 文件.png。它会列出所有可疑通道，如果看到
 
 宽高修改（高频考点）：如果图片显示不全，用 Python 脚本爆破/修改 IHDR 块里的宽和高，并修复 CRC 值。
 
-双图对比：两张图片长得很像，大概率是“盲水印”。需要用到 blind-watermark 等脚本或者在线工具。
+双图对比：两张图片长得很像，大概率是“盲水印”。需要用到 blind-watermark 等脚本或者在线工具。  
 
 3. BMP 后缀
-BMP 是未压缩格式，体积大，也常用来做 LSB 隐写。
+BMP 是未压缩格式，体积大，也常用来做 LSB 隐写。  
 
 主力工具：zsteg、Stegsolve、wbStego
-
 解题步骤：
-
 直接上 zsteg -a 文件.bmp，经常能扫出 LSB 数据。
-
 如果是调色板隐写（Palette-based），需要写 Python 脚本（用 PIL 库）读取调色板顺序，或者用 Stegsolve 的 Colour Palette 功能查看。
 
-有时候是 wbStego 加密，如果 zsteg 没结果，可以尝试用 stegseek（它也支持 BMP）。
+有时候是 wbStego 加密，如果 zsteg 没结果，可以尝试用 stegseek（它也支持 BMP）。  
 
 4. GIF 后缀
 GIF 是动图，核心考点在多帧和调色板。
-
 主力工具：Stegsolve、ffmpeg、identify
+解题步骤：  
 
-解题步骤：
-
-分帧：用 ffmpeg -i 文件.gif frame_%d.png 或 convert 文件.gif frame_%d.png 把每一帧切出来，逐一查看是否有隐藏文字或残缺二维码。
+分帧：用 ffmpeg -i 文件.gif frame_%d.png 或 convert 文件.gif frame_%d.png 把每一帧切出来，逐一查看是否有隐藏文字或残缺二维码。  
 
 帧时间隐写：有些题目把 flag 的二进制写在了每一帧的延时时间（帧间隔）里。需要用 identify -format "%T\n" 文件.gif 获取每帧延时，然后把 10ms/20ms 转换成 0/1 再转 ASCII。
-
-
 
 调色板隐写：同 BMP。
 
 Stegsolve 帧浏览：在 Stegsolve 里用 Frame Browser 可以逐帧查看，非常方便。
+
+## 压缩文件分析
+
+### 伪加密
+
+    如果压缩文件是加密的，或文件头正常但是解压失败，首先尝试文件是否位伪加密  
+    zip文件是否加密由标识符显示，再每个文件的目录有一位专门来表示是否加密，将其设置为00表示未加密  
+    如果这时候解压成功了，说明是伪加密，否正出错为真加密  
+    用16进制编辑器进入后，搜索504B0102，后的第5，6个字符，改成0000  
+    rar的话是第24位的尾数改为0，4是加密
+
+### 暴力破解  
+    利用ARCHPR工具（F:/CTFtools/Arc）
+    已知前几位
+![alt text](image-32.png)
+
+### 明文攻击
+    知道加密的zip中的部分明文内容，利用这些内容推测出密钥并解密zip  
+    相比于暴力，这种在破解比较复杂的压缩包时效率更高  
+![alt text](image-33.png)
+    tips：明文压缩的算法和加密的压缩算法一样
+
+## 流量取证
+![alt text](image-35.png)
