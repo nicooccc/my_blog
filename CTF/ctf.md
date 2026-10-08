@@ -2,7 +2,7 @@
     网页导航
     [navisec](https://navisec.io/)
     [渗透师](https://www.shentoushi.top/)
-
+    https://tools.qsnctf.com/#//home
 
 ## 工具
     binwalk  
@@ -269,3 +269,76 @@ Stegsolve 帧浏览：在 Stegsolve 里用 Frame Browser 可以逐帧查看，�
 
 ## 流量取证
 ![alt text](image-35.png)
+
+### wireshark
+
+#### 过滤指令
+    源ip或者目的ip
+```wireshark 
+    ip.src eq x.x.x.x or ip.dst eq x.x.x.x  
+    ip.addr eq x.x.x.x
+```
+    过滤http
+``` wireshark
+    tcp.port eq 80 or udp.port eq 80   
+    tcp.dstport == 80 //tcp目的端口为80
+    tcp.srcport == 80 //tcp源端口为80
+    tcp.port >= 1 and tcp.port <= 80
+```
+    过滤协议tcp/udp/arp/icmp
+    过滤MAC
+```wireshark
+    eth.dst == xx:xx:xx:xx:xx:xx 过滤目标
+```
+![alt text](image-36.png)
+    http模式过滤
+    ![alt text](image-37.png)
+```wireshark
+    http.request.method == "GET"
+    http.request.method == "POST"
+    http.request.uri ==" "
+    http contains "GET"
+    http contains "HTTP/1."
+    http.request.method == "GET" && http contains "User-Agent:"
+    http contains "flag"
+    http contains "key"
+    tcp contains 'flag'
+```
+
+#### 解题过程
+
+    拿到pcap后先用wireshark分析数据报的组成部分  
+    主要是IPV4的  
+    如果是http的部分，文件是分块传输的，要把他们合并起来
+        根据数据包的特征筛选  
+![alt text](image-38.png)
+    流汇聚
+![alt text](image-39.png)
+    在关注的数据报中进行流汇聚可以还原成数据  
+    http流中包含重要内容：  
+    1，html中直接包含重要信息  
+    2，上传或下载文件中包含文件名和hash，常用post请求上传  
+    3，一句话木马，post请求，内容包含eval，用base64加密
+    wireshark里面可以进行数据提取自动提取http传输的文件内容  
+    ![alt text](image-40.png)
+    导出单个分组的字节流  
+![alt text](image-41.png)
+
+#### WIFI流量的分析
+    kali中利用aircrack-ng xxx.cap进行无线密码破解  
+    wifi加密WPA， WEQ ， WPA2  
+    aircrack-ng xxx.cap -w pass.txt  
+
+#### USB流量分析
+    在线网址 tools.qsnctf.com/misc/usb_flow_analyze   
+    USB协议数据部分在Leftover Capture Data中  
+![alt text](image-42.png) 
+    键盘数据包的长度为8个字节，击键星系在第三个字节，而每次key stroke都会产生一个keyboard event usb packet  
+    提取data方法  
+    1，导出为CSV（不好用）
+![alt text](image-43.png)
+    2，tshark，将lcd的数据单独复制出来
+```bash
+    tshark -r usb1.pcap$目的文件$ -T fields -e usb,capdata > usbdata.txt$写出文件$
+```
+![alt text](image-44.png)
