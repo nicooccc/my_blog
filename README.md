@@ -7,10 +7,10 @@
     微信小程序：ftp://10.132.219.5:303/
     小徐：10.132.219.5:8380
     葛一粟：ftp://10.132.219.5:5883/
-日期:2026.9.10  
+日期:2026.9.10
 ```c
     #include<bits/stdc++.h>
-    using namespace std;
+    using namespace std;  
     int main()
     {
         int a;
@@ -30,7 +30,7 @@
 [CISCO网址](https://www.netacad.com/)  
 ```bash
     git add .
-    git commit -m "更新DAY9"
+    git commit -m "更新DAY10"
     git push
 ```  
     1  

@@ -1,4 +1,6 @@
 
+
+
 ## 网络设备  
  ![alt text](image.png)  
 
@@ -72,20 +74,129 @@ WAN广域网：由多lan组成
 - 以字母或数字结尾
 - 仅使用字母，数字和波折号
 - 小于64字符
-### 配置密码
-```bash
-    hostname newname //修改名字在全局配置下
-    password 密码
-    login
-    end
-```
+## 配置密码
+
+    保护用户EXEC模式安全
 ![alt text](image-16.png)
+    保护特权EXEC模式安全  
 ![alt text](image-17.png)
-    enable sercet password //设置进入enable的密码·
+    保护VTY线路的示例  
+![alt text](image-18.png)
 ```bash
+    configure terminal
     service password-encryption //加密密码
 ```
+    查看加密
+![alt text](image-19.png)
 
-### 横幅消息
+## 横幅消息
     banner motd #xxx内容#
 
+
+## 配置文件
+
+
+### startup-config(启动配置文件)
+    启动或重启后不消失，存储再NVRAM中
+
+```bash
+
+    show startup-config
+```
+
+### running-config(运行配置文件)
+
+    存储再ram中，重启后或启动消失
+
+```bash
+    show running-config
+```
+
+## 修改配置
+
+![alt text](image-20.png)
+
+```bash
+    copy running-config startup-config  //将目前的配置保存到启动的配置  还可以用来返回上一次配置  
+    dir flash //闪存  or nvram //内存  
+    reload //重新加载  
+    erase startup  //删除启动配置  
+    reload //这次启动将恢复默认
+```
+
+## 2.6端口和地址  
+
+### .1IP地址  
+
+    IPV4地址，32位，要设置子网掩码，便于区分子网  
+    IPV6地址，128位，不区分大小写 
+
+### .2接口和端口 
+
+![alt text](image-21.png)
+
+## 2.7配置IP地址  
+
+    DHCP自动配置  
+
+
+### .4交换机虚拟接口配置  
+
+![alt text](image-22.png)
+
+
+
+## 2.8.1测试配置接口  
+
+```bash
+    show ip interface brief  //查看接口ip
+
+```
+
+![alt text](image-23.png)
+    想要配置交换机的Vlan IP  
+
+```bash
+    enable 
+    configure terminal  
+    interface vlan 1
+    ip address xxx.xxx.xxx.xxx xxx.xxx.xxx.xxx  
+    no shutdown
+```
+
+```bash pC
+    ping xxx.xxx.xxx.xxx
+```
+
+## 2.9总结  
+
+![alt text](image-24.png)
+
+
+
+##  3.1.2通信基础知识  
+    三要素：  
+    发送方  
+    接收方  
+    信道：消息从源到目的地提供路径的介质组成  
+
+## 3.1.5网络协议要求  
+    消息编码：采用适合介质的格式，先将信息转化位然后在介质上编码位电压模式，光纤中的红外光，目的主机接受并解码  
+    消息的格式和封装：将消息封装在数据包中传输，数据包的格式  
+![alt text](image-25.png)
+    消息大小：要进行分组传输  
+    消息的时序：
+    ![alt text](image-26.png)
+    消息传输选项  
+    ![alt text](image-27.png)
+
+### 网络协议
+
+![alt text](image-28.png)
+
+### tcp/ip协议组
+![alt text](image-29.png)
+![alt text](image-30.png)
+![alt text](image-31.png)
+![alt text](image-32.png)
+![alt text](image-33.png)

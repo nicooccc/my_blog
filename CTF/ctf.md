@@ -18,7 +18,11 @@ URL Safe Base64：把 + / 换成 - _，解码前先替换：
     echo "你的字符串" | tr '_-' '/+' | base64 -d
 ```
     在线网址：http://www.hiencode.com/base64.html
-    循环反复尝试 base64 / base32。
+    循环反复尝试 base64 / base32。  
+    在线hex转文件的网址  https://gchq.github.io/CyberChef/  
+![alt text](image-54.png)
+    将文件拖入input，左侧选择for hex  
+    output选择save  
 ## 基本赛制与题型  
     题目 ---》 flag ---> 分数 ---》名次
     i春秋，e春秋
@@ -53,6 +57,43 @@ URL Safe Base64：把 + / 换成 - _，解码前先替换：
 ```bash
     firefox-esr //狐火
 ```
+# misc思路
+    1，先查看文件类型 
+    {
+        有些时候是假的文件头，就要进行替换  
+        可以先直接进行vim或者010查看并搜索flag字样
+    } 
+    根据类型进行下一步
+    2，如果是图片先看看exif(查看图片信息)
+    {
+        若png有问题在在线工具中进行修复尺寸  
+        png还会有LSB隐写{
+            使用zsteg
+        }
+    }
+    3，查看隐藏文件是否有
+    {
+        有的话就分离  
+        foremost  
+        binwalk
+        dd
+        根据分离的文件类型可能是zip，rar的压缩类型
+        {
+            zip如果是加密的话可以先看看是不是伪加密的  
+            用16进制编辑器进入后，搜索504B0102，后的第5，6个字符，改成0000  
+            rar的话是第24位的尾数改为0，4是加密
+            {
+                如果是真加密
+            }
+        }
+        非压缩类型再次vim或010查找flag  
+        {
+            有二维码可以通过QRsearch  
+            或者zbarimg xxx.png
+        }
+
+        }
+
 
 # 杂项的解题思路
 
@@ -255,12 +296,14 @@ Stegsolve 帧浏览：在 Stegsolve 里用 Frame Browser 可以逐帧查看，�
     如果这时候解压成功了，说明是伪加密，否正出错为真加密  
     用16进制编辑器进入后，搜索504B0102，后的第5，6个字符，改成0000  
     rar的话是第24位的尾数改为0，4是加密
-
 ### 暴力破解  
     利用ARCHPR工具（F:/CTFtools/Arc）
     已知前几位
 ![alt text](image-32.png)
 
+### 哈希对比
+    工具zip2John
+![alt text](image-45.png)
 ### 明文攻击
     知道加密的zip中的部分明文内容，利用这些内容推测出密钥并解密zip  
     相比于暴力，这种在破解比较复杂的压缩包时效率更高  
@@ -269,7 +312,6 @@ Stegsolve 帧浏览：在 Stegsolve 里用 Frame Browser 可以逐帧查看，�
 
 ## 流量取证
 ![alt text](image-35.png)
-
 ### wireshark
 
 #### 过滤指令
@@ -310,7 +352,7 @@ Stegsolve 帧浏览：在 Stegsolve 里用 Frame Browser 可以逐帧查看，�
     拿到pcap后先用wireshark分析数据报的组成部分  
     主要是IPV4的  
     如果是http的部分，文件是分块传输的，要把他们合并起来
-        根据数据包的特征筛选  
+    根据数据包的特征筛选  
 ![alt text](image-38.png)
     流汇聚
 ![alt text](image-39.png)
@@ -320,15 +362,13 @@ Stegsolve 帧浏览：在 Stegsolve 里用 Frame Browser 可以逐帧查看，�
     2，上传或下载文件中包含文件名和hash，常用post请求上传  
     3，一句话木马，post请求，内容包含eval，用base64加密
     wireshark里面可以进行数据提取自动提取http传输的文件内容  
-    ![alt text](image-40.png)
+![alt text](image-40.png)
     导出单个分组的字节流  
 ![alt text](image-41.png)
-
 #### WIFI流量的分析
     kali中利用aircrack-ng xxx.cap进行无线密码破解  
     wifi加密WPA， WEQ ， WPA2  
     aircrack-ng xxx.cap -w pass.txt  
-
 #### USB流量分析
     在线网址 tools.qsnctf.com/misc/usb_flow_analyze   
     USB协议数据部分在Leftover Capture Data中  
@@ -341,4 +381,15 @@ Stegsolve 帧浏览：在 Stegsolve 里用 Frame Browser 可以逐帧查看，�
 ```bash
     tshark -r usb1.pcap$目的文件$ -T fields -e usb,capdata > usbdata.txt$写出文件$
 ```
-![alt text](image-44.png)
+#### COTP协议
+    COTP  
+    可以理解为基于TCP的工控TCP，主要有五种类 型：  
+    CR Connect Request (0x0e)——握手，发送方发送  
+    CC Connect Confirm (0x0d)——握手，接收方发送  
+    DT Data (0x0f)——传正常数据  
+    UD User Data (0x04)——少见，传自定义数据  
+    ED Expedited Data (0x01)——少见，传紧急数据  
+    CR和CC只在建立连接时由双方发送，发起方发送CR，被动方发送CC，后续数据主要走DT。因为协议类似于TCP，较为底层，所以没有其他比较有用的协议字段可供解题；同样因为COTP较为底层，用来出题的概率较小，就像用纯TCP出题的概率一样  
+
+
+
