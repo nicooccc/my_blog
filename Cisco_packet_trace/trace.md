@@ -200,3 +200,48 @@ WAN广域网：由多lan组成
 ![alt text](image-31.png)
 ![alt text](image-32.png)
 ![alt text](image-33.png)
+
+## 3.6数据分装  
+
+    分段  
+    排序：标号多个片段以便定向和重组，标识用于片段在到达是对其排序和组装  
+    PDU  
+![alt text](image-34.png)
+
+## 地址  
+    网络层地址：负责将IP数据包从源设备传输到同一段网络或者其他网络中的目的主机  
+    物理层地址：将数据链路帧从一个网卡传输到相同网络的另一个网络上  
+![alt text](image-35.png)
+
+### 网络层  
+![alt text](image-36.png)
+
+
+### 数据链路层：不同IP网络  
+![alt text](image-37.png)
+
+    必须配置默认网关IP，所有向远程网络中的数据包都会走默认网关  
+![alt text](image-38.png)
+
+    帧的MAC地址在每段链路上传输的会更改
+
+![alt text](image-39.png)
+
+
+# 物理层
+
+![alt text](image-40.png)
+
+## 编码  
+
+![alt text](image-41.png)
+
+## 信号  
+![alt text](image-42.png)
+
+![alt text](image-43.png)
+![alt text](image-44.png)
+
+## 带宽  
+
+![alt text](image-45.png)

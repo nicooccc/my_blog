@@ -392,4 +392,13 @@ Stegsolve 帧浏览：在 Stegsolve 里用 Frame Browser 可以逐帧查看，�
     CR和CC只在建立连接时由双方发送，发起方发送CR，被动方发送CC，后续数据主要走DT。因为协议类似于TCP，较为底层，所以没有其他比较有用的协议字段可供解题；同样因为COTP较为底层，用来出题的概率较小，就像用纯TCP出题的概率一样  
 
 
+    http://www.efittech.com/hxdec.aspx
+    汉信码
+![alt text](image-55.png)
 
+    密文有斜杠可能是rabbit加密
+    解密网址
+    www.sojson.com/encrypt_rabbit.html
+
+    PNG头文件base64加密后  
+![alt text](image-56.png)
