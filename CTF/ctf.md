@@ -402,3 +402,182 @@ Stegsolve 帧浏览：在 Stegsolve 里用 Frame Browser 可以逐帧查看，�
 
     PNG头文件base64加密后  
 ![alt text](image-56.png)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# MISC真题演练 
+## bugku
+
+### 这是一张单纯的图片
+    #&的大概率时html编码  
+![alt text](image-57.png)
+
+
+### linux
+
+    直接拖入工具台  
+![alt text](image-58.png)
+
+### 隐写
+    png高度被修改
+![alt text](image-59.png)
+
+### talent
+    在工具台中过滤flag
+![alt text](image-60.png)
+
+
+### 眼见非实
+
+![alt text](image-61.png)
+    发现是zip，改一下啊后缀  
+    解压，一个文件一个文件找  
+![alt text](image-62.png)
+
+### 多种发发解决
+    工作台中发现是base64编码的，转一下图片
+![alt text](image-63.png)
+    转出来是二维码，扫一下
+![alt text](image-64.png)
+
+### linux2
+    导入工作台，直接得出
+![alt text](image-65.png)
+
+### 又一个单纯图片
+    放入工具台发现又隐含文件  
+![alt text](image-66.png)
+![alt text](image-67.png)
+
+### 闪的好快  
+    拿到发现是gif   
+    在工作台中分离，发现有18个二维码
+    进入工作台批量扫码  
+![alt text](image-68.png)
+
+### 宽带用户  
+    导入工作台，进入路由取证  
+    搜索username  
+![alt text](image-69.png)
+
+### 逆向入门  
+
+    导入工作台，查看16进制发现是base64的编码  
+    转图像  
+![alt text](image-70.png)
+
+### spilt_all  
+
+    导入工作台，查看16进制发现有89a，判断是gif，利用vim编辑，得到gif   D
+    再将切片分离并拼接  
+![alt text](image-71.png)
+### 薛定谔的猫
+    打开16进制擦看起，发现有py代码
+![alt text](image-72.png)
+    导出，运行得到flag.txt
+
+### 图穷匕见
+    图片尾部有附加数据，分离出来  
+    转ascii码发现是二维坐标，导入一下  
+    转化位二位码
+![alt text](image-73.png)
+
+### 0和1的故事
+
+    载入工作台发现，全是01  
+    转化为二维码，补全一下
+![alt text](image-74.png)
+
+### 赛博朋克  
+
+    题目是一个zip加密的  
+    伪加密修改一下  
+    发现里面有个txt,其实是png  
+    修改之后查看隐写
+![alt text](image-75.png)
+![alt text](image-76.png)
+
+### 隐写2
+
+    题目是个png，放入工作台发现有尾巴  
+    提取一下
+![alt text](image-77.png)
+    提取之后发现是个zip
+    ![alt text](image-78.png)
+
+
+### LOOK
+    放入工作台发现可以是zip
+![alt text](image-79.png)
+    解压一下    
+    发现是bmp，考虑隐写，启动zsteg  
+    找到了  
+![alt text](image-80.png)
+
+
+### 选择跳跃
+
+    mps隐写，密码是syclovergreek  
+![alt text](image-81.png)
+
+### ping
+    送入工作台发现
+    flag{dc76a1eee6e3822877ed627e0a04ab4a}
+![alt text](image-82.png)
+![alt text](image-83.png)
+![alt text](image-84.png)
+
+### 蹭网密码
+![alt text](image-87.png)
+![alt text](image-85.png)
+![alt text](image-86.png)
+
+
+### usb流量  
+    放入工作台  
+    进入usb专项  
+![alt text](image-88.png)
+
+
+### 普通的二维码  
+    bmp，考虑一下隐写和尾部  
+![alt text](image-89.png)
+    有点像8进制  
+    转化为ascii
+![alt text](image-90.png)
+
+
+### 简单取证  
+
+![alt text](image-91.png)
+![alt text](image-92.png)
+![alt text](image-93.png)
