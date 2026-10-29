@@ -458,7 +458,6 @@ Stegsolve 帧浏览：在 Stegsolve 里用 Frame Browser 可以逐帧查看，�
 
 ### 眼见非实
 
-![alt text](image-61.png)
     发现是zip，改一下啊后缀  
     解压，一个文件一个文件找  
 ![alt text](image-62.png)
@@ -581,3 +580,161 @@ Stegsolve 帧浏览：在 Stegsolve 里用 Frame Browser 可以逐帧查看，�
 ![alt text](image-91.png)
 ![alt text](image-92.png)
 ![alt text](image-93.png)
+
+### blind injection
+![alt text](image-94.png)
+
+
+### 超简单隐写
+![alt text](image-95.png)
+    两个相同的图片，考虑盲水印  
+![alt text](image-96.png)
+    得到一个密码
+![alt text](image-97.png)
+    解压出passwd.txt
+![alt text](image-98.png)
+    发现是base64的编码，转图像出不来  
+    解码:  
+![alt text](image-99.png)
+    乱码  
+    考虑base64隐写  
+![alt text](image-100.png)
+    flag的密码出来了  
+![alt text](image-101.png)
+
+### 阿达
+
+    放入工作台发现有尾部的压缩包  
+![alt text](image-135.png)
+    flag在里面，加密的  
+    发现图片exif的相机名字很奇怪  
+![alt text](image-136.png)
+    发现不超过16，考虑hex   
+![alt text](image-137.png)
+![alt text](image-138.png)
+
+
+### 贝斯手
+    直接爆破
+![alt text](image-139.png)
+    5+58说明，5为MD5加密，58为base58
+![alt text](image-140.png)
+
+![alt text](image-141.png)
+
+
+
+
+
+
+
+
+
+## CTFHub
+
+### 相机制造商  
+    flag藏在exif中
+![alt text](image-102.png)
+
+### word文件的本质
+
+    word文件本质上，是一个压缩包，是可以被分离出来的
+![alt text](image-103.png)
+![alt text](image-104.png)
+    分离出flag.xml
+
+### just a rar
+    4位数密码
+![alt text](image-105.png)
+
+    解压初图片放入工作台  
+    找到flag  
+![alt text](image-107.png)
+
+### 你猜猜我是个啥
+    题目是个zip，放进工作台看看  
+    发现是个png，改一下
+    发现是个二维码，扫出来很猎奇 
+![alt text](image-108.png)
+    原来在文件里  
+![alt text](image-109.png)
+
+### 签个道  
+    zip文件损坏，放入工作台  
+    发现是png，改完发现是二维码扫一下
+![alt text](image-110.png)
+
+
+
+### 藏藏藏
+
+    是个jpq，发现尾部有数据
+    导出，解压
+![alt text](image-111.png)
+    binwalk分离一下  
+![alt text](image-112.png)
+    找一找，找到了
+![alt text](image-113.png)
+
+### 认真你就输了  
+    是一个xls，binwalk直接分离
+![alt text](image-114.png)
+    耶耶耶  
+![alt text](image-115.png)
+### 蛛丝马迹  
+![alt text](image-116.png)
+![alt text](image-117.png)
+
+
+### hidden
+    导入工作台，发现尾部有残留
+![alt text](image-118.png)
+    导出，看头文件是个zip  
+![alt text](image-119.png)
+    加密的，看是不是伪加密
+![alt text](image-120.png)
+    看来不是，暴力一下  
+![alt text](image-121.png)
+    解压出来图片还是坏的  
+![alt text](image-122.png)
+    crc修复一下  
+![alt text](image-123.png)
+    扫码一下
+![alt text](image-124.png)
+
+### 及你太美  
+    一张坏的图片，一张好的  
+![alt text](image-125.png)
+![alt text](image-126.png)
+    写入一下头文件
+![alt text](image-127.png)
+
+### taowa
+    一直点，写在最后一个图片里面了
+![alt text](image-128.png)
+
+### 一叶障目
+    crc错误，修复一下啊
+![alt text](image-129.png)
+    修好了
+![alt text](image-130.png)
+
+
+### minified
+    提取不出任何有效信息  
+![alt text](image-131.png)
+    发现red的通道为全黑，考虑一下0通道问题
+![alt text](image-133.png)
+![alt text](image-132.png)
+    分别对每个0通道进行xor操作
+![alt text](image-134.png)
+
+### 键盘  
+
+    有一个zip，检查一下是不是伪加密  
+![alt text](image-142.png)
+    docx需要密码
+![alt text](image-143.png)
+    对应键盘上的
+![alt text](image-144.png)
+![alt text](image-145.png)
