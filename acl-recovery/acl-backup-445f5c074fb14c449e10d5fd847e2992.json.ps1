@@ -752,7 +752,7 @@ try {
     for ($i = $recoveries.Count - 1; $i -ge 0; $i--) {
       $recovery = $recoveries[$i]
       if (-not $recovery.attempted) { continue }
-      Write-Decision rollback $recovery.path selected 'The repair failed; restore every attempted DACL change from this invocation in reverse order before stopping.'
+      Write-Decision rollback $recovery.path selected 'The repair failed; restore every attempted DACL change from this invocation in reverse order before stop.'
       try {
         Restore-SavedDacl -FullPath $recovery.path -Record $recovery.record -Root $AllowRoot
         $recovery.restored = $true

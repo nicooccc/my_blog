@@ -278,3 +278,20 @@ WAN广域网：由多lan组成
 ![alt text](image-49.png)
 
 ![alt text](image-50.png)
+
+
+# 数据链路层
+
+## Ethernet
+
+![alt text](image-51.png)
+
+encapsulate -> 封装  
+topology -> 拓扑  
+
+### logic topology and physical topology  
+![alt text](image-52.png)
+
+
+### PPP
+![alt text](image-53.png)
