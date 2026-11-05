@@ -279,7 +279,17 @@ WAN广域网：由多lan组成
 
 ![alt text](image-50.png)
 
+## wireless lan  
+    WIFI(IEEE 802.11):wireless LAN(WIFI)(CSMA/CA)    
+    BLueTooth:personal area network,(1 - 100m)  
+    WIMAX：Worldwide interopreability for Microware Access(IPHONE -- Microware)  
+    ZigBee:IOT（物联网）low-power -cause, low-data communciations    
 
+
+# Number Systems
+
+## Binary and IPV4  
+    IPV4 use 32 bits, divied into four sections
 # 数据链路层
 
 ## Ethernet
@@ -294,4 +304,81 @@ topology -> 拓扑
 
 
 ### PPP
-![alt text](image-53.png)
+![alt text](image-53.png)  
+
+w
+## CSMA/CD  
+    wireless lan use CSMA/CA  
+    bus-topology and hub-use Enthernet LAN use CSMA/CD  
+    The link is free and PC1 has to send frame     
+![alt text](image-54.png)
+    The hub receives frame and transport to every port while PC2 need `t`o send frame, pc2 have to wait as it receive a frame  
+![alt text](image-55.png)
+
+
+## CSMA/CA
+
+![alt text](image-56.png)
+
+![alt text](image-57.png)
+
+# Ethernet Encapsulation  
+
+![alt text](image-58.png)
+![alt text](image-59.png)
+
+
+## LLC
+![alt text](image-70.png)
+## MAC
+    ![alt text](image-62.png)
+
+### MAC ADDRESS
+
+    48bits，3bytes is OUI
+    USE on the local network segment  
+    Provieds a method for device identification at the link layer
+## FRAME  
+![alt text](image-60.png)
+![alt text](image-61.png)
+    同步和帧开始：Preamble and Start Frame
+
+### Processing  
+
+    MAC address is encoded into the ROM chip Permanently  
+
+### unicast MAC Address
+
+![alt text](image-63.png)
+
+### Broadcast MAC Address
+
+    destination MAC address is FF-FF-FF-FF-FF-FF  
+![alt text](image-64.png)
+
+### 组播地址
+![alt text](image-65.png)
+
+## Switch Fundamental  
+
+    MAC address table： cotent addressable memory  
+    内容可寻址内存 (CAM) 表
+### MAC address learn by itself  
+![alt text](image-66.png)
+
+### Dafault Gateway
+    一个设备想要与其他网络上得设备通信，在发送帧时会把目的MAC地址设为该网络上连接互联网的路由器地址  
+
+## 思科交换机的转发  
+
+### store and forward  switching
+    store frames and check FCS/CRC  
+    need 
+![alt text](image-67.png)
+### cut-through switching  
+    receive until the end of the dst MAC address then forward
+![alt text](image-68.png)
+
+
+### MEMORY BUFFERING methods
+![alt text](image-69.png)

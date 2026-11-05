@@ -390,7 +390,7 @@ Stegsolve 帧浏览：在 Stegsolve 里用 Frame Browser 可以逐帧查看，�
     UD User Data (0x04)——少见，传自定义数据  
     ED Expedited Data (0x01)——少见，传紧急数据  
     CR和CC只在建立连接时由双方发送，发起方发送CR，被动方发送CC，后续数据主要走DT。因为协议类似于TCP，较为底层，所以没有其他比较有用的协议字段可供解题；同样因为COTP较为底层，用来出题的概率较小，就像用纯TCP出题的概率一样  
-
+    默认端口是102
 
     http://www.efittech.com/hxdec.aspx
     汉信码
@@ -738,3 +738,10 @@ Stegsolve 帧浏览：在 Stegsolve 里用 Frame Browser 可以逐帧查看，�
     对应键盘上的
 ![alt text](image-144.png)
 ![alt text](image-145.png)
+
+
+### 简单的隐写  
+    放入工具台，发现尾部数据有问题，像是base32
+![alt text](image-146.png)
+![alt text](image-147.png)
+
