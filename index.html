@@ -2,8 +2,8 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Document</title>
-  <meta name="description" content="Description">
+  <title>Nico 的学习博客</title>
+  <meta name="description" content="计算机网络、系统基础、编程与网络安全的学习笔记">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@5/dist/themes/core.min.css">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@5/dist/themes/addons/vue.min.css">
@@ -12,15 +12,16 @@
   <div id="app"></div>
   <script>
     window.$docsify = {
-      name: 'Nico的博客',
+      name: 'Nico 的学习博客',
       repo: 'nicooccc/my_blog',
-      loadSidebar: true,   // 开启侧边栏
-      loadNavbar: false,    // 开启顶部导航
-      subMaxLevel: 2,      // 侧边栏自动生成文章内目录的层级
-      coverpage: true      // 如果写了 _coverpage.md，可以开启封面
-}
+      loadSidebar: true,
+      loadNavbar: true,
+      subMaxLevel: 3,
+      coverpage: false,
+      maxLevel: 4,
+      relativePath: true   // 图片等相对链接按当前 md 文件所在目录解析
+    }
   </script>
-  <!-- Docsify resource -->
   <script src="//cdn.jsdelivr.net/npm/docsify@5"></script>
 </body>
 </html>
