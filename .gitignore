@@ -1,0 +1,57 @@
+# ============================================================
+# Nico 的学习博客 — Docsify 静态内容仓库
+#
+# 注意：这是「内容仓库」，docs/ 与 assets/ 下的
+#   .md / .png / .jpg / .pptx / .c / .cpp / .exe
+# 都是博客正文或课程附件，一律不忽略。
+# .nojekyll 是 GitHub Pages 必需文件，必须保留。
+# ============================================================
+
+# --- 操作系统产生的垃圾文件 ---
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+desktop.ini
+$RECYCLE.BIN/
+Spotlight-V100
+.Trashes
+
+# --- 编辑器 / IDE 配置 ---
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+*~
+*.sublime-workspace
+
+# --- Obsidian / AI 工具的本地状态 ---
+.obsidian/
+.continue/
+.claude/
+.cursor/
+
+# --- 临时文件、日志与备份 ---
+*.tmp
+*.temp
+*.log
+*.bak
+*.backup
+*.orig
+*.rej
+
+# --- Node / Docsify CLI（本地预览安装时产生） ---
+node_modules/
+npm-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# --- 编译中间产物（不含作为课程附件提交的 .exe） ---
+*.o
+*.obj
+*.class
+*.pyc
+__pycache__/
