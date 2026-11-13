@@ -1,3 +1,4 @@
+<!-- synced-from-vault: 04-Linux与网络安全/CTF入门与题型总览.md | updated: 2026-11-06 -->
 # CTF 入门与题型总览
 
 <!-- guide-start -->
@@ -26,7 +27,7 @@
 
 https://tools.qsnctf.com/#//home
 
-### 工具
+## 工具与在线资源
 
 - binwalk
 - file
@@ -34,7 +35,7 @@ https://tools.qsnctf.com/#//home
 - 010editor
 - zbarimg xxx.png //扫码工具
 
-![工具 · 图 1](../../../assets/images/CTF/image-31.png)
+![image-31](../../../assets/images/CTF/image-31.png)
 
 Base64 特征：字符集 A-Z a-z 0-9 + /，末尾常有 = 填充。
 Base32 特征：字符集 A-Z 2-7，通常全大写，长度是 8 的倍数，末尾常有 =。
@@ -49,12 +50,12 @@ echo "你的字符串" | tr '_-' '/+' | base64 -d
 
 在线hex转文件的网址  https://gchq.github.io/CyberChef/
 
-![工具 · 图 2](../../../assets/images/CTF/image-54.png)
+![image-54](../../../assets/images/CTF/image-54.png)
 
 - 将文件拖入input，左侧选择for hex
 - output选择save
 
-### 基本赛制与题型
+## 基本赛制与题型
 
 - 题目 ---》 flag ---> 分数 ---》名次
 - i春秋，e春秋
@@ -63,35 +64,35 @@ echo "你的字符串" | tr '_-' '/+' | base64 -d
 
 获取flag
 
-![目标 · 图 3](../../../assets/images/CTF/image-2.png)
+![image-2](../../../assets/images/CTF/image-2.png)
 
 ### 比赛形式
 
-![比赛形式 · 图 4](../../../assets/images/CTF/image-1.png)
+![image-1](../../../assets/images/CTF/image-1.png)
 
-![比赛形式 · 图 5](../../../assets/images/CTF/image.png)
+![image](../../../assets/images/CTF/image.png)
 
 ### 题目类型
 
-![题目类型 · 图 6](../../../assets/images/CTF/image-3.png)
+![image-3](../../../assets/images/CTF/image-3.png)
 
-![题目类型 · 图 7](../../../assets/images/CTF/image-4.png)
+![image-4](../../../assets/images/CTF/image-4.png)
 
-![题目类型 · 图 8](../../../assets/images/CTF/image-5.png)
+![image-5](../../../assets/images/CTF/image-5.png)
 
-![题目类型 · 图 9](../../../assets/images/CTF/image-6.png)
+![image-6](../../../assets/images/CTF/image-6.png)
 
 ### 学习攻略
 
-![学习攻略 · 图 10](../../../assets/images/CTF/image-7.png)
+![image-7](../../../assets/images/CTF/image-7.png)
 
 *  网络技术
 *  http协议
-*  数据库的基本操作，Sql语句（增删查改，ADFC），数据库优化
+*  数据库的基本操作，Sql语句（增删查改，CRUD），数据库优化
 
 ### 在线演练
 
-![在线演练 · 图 11](../../../assets/images/CTF/image-8.png)
+![image-8](../../../assets/images/CTF/image-8.png)
 
 实验吧：http://shiyanbar.com/ctf/practice
 
@@ -103,62 +104,49 @@ BugkuCTF: http://ctf.bugku.com/login
 - kalilinux:已经安装了很多的软件和工具
 
 ```bash
-firefox-esr //狐火
+firefox-esr  # Firefox ESR（Kali 预装浏览器）
 ```
 
-## misc思路
+## Misc 通用排查思路
 
-- 1，先查看文件类型
-- {
-- 有些时候是假的文件头，就要进行替换
-- 可以先直接进行vim或者010查看并搜索flag字样
-- }
-- 根据类型进行下一步
-- 2，如果是图片先看看exif(查看图片信息)
-- {
-- 若png有问题在在线工具中进行修复尺寸
-- png还会有LSB隐写{
-- 使用zsteg
-- }
-- }
-- 3，查看隐藏文件是否有
-- {
-- 有的话就分离
-- foremost
-- binwalk
-- dd
-- 根据分离的文件类型可能是zip，rar的压缩类型
-- {
-- zip如果是加密的话可以先看看是不是伪加密的
+> 拿到一道 Misc 题后的固定排查顺序；具体命令与截图见后文各节。
 
-用16进制编辑器进入后，搜索504B0102，后的第5，6个字符，改成0000
+1. **先看真实文件类型**
+   - `file <文件名>`；有时文件头是伪造的，需要按真实格式改回
+   - 直接用 `vim` 或 010 Editor 打开，搜索 `flag` 字样
+   - 根据真实类型决定下一步
 
-- rar的话是第24位的尾数改为0，4是加密
-- {
-- 如果是真加密
-- }
-- }
-- 非压缩类型再次vim或010查找flag
-- {
-- 有二维码可以通过QRsearch
-- 或者zbarimg xxx.png
-- }
+2. **如果是图片，先查元数据与隐写**
+   - `exiftool <文件名>` 看 EXIF / Comment 字段
+   - PNG 显示不全 → 优先修复宽高与 CRC
+   - PNG 可能有 LSB 隐写 → 用 `zsteg` 扫描
 
-}
+3. **查隐藏文件 / 附加数据**
+   - 分离工具：`foremost`、`binwalk`、`dd`
+   - 分离出来是 ZIP / RAR：
+     - ZIP 先判断是否伪加密：16 进制编辑器搜索 `50 4B 01 02`，把加密标志位改成 `0000`
+     - RAR 的加密位在文件头第 24 字节附近，改为 0 表示未加密
+     - 确认为真加密 → 转「暴力破解 / 明文攻击」
+
+> **提示** · 待验证（课堂速记）
+> 原笔记写「搜索 504B0102 后的第 5、6 个字符改成 0000」「RAR 第 24 位尾数改为 0」。ZIP 中央目录项的通用标志位有固定偏移，RAR 也分版本；这两条是速记，实操请以文件结构为准，此处不臆断具体偏移。
+
+4. **非压缩类型**：再用 `vim` / 010 搜 `flag`
+5. **出现二维码**：`QRsearch` 或 `zbarimg xxx.png`
 
 ## 杂项的解题思路
 
 ### 文件类型的识别
 
-![文件类型的识别 · 图 12](../../../assets/images/CTF/image-10.png)
+![image-10](../../../assets/images/CTF/image-10.png)
 
 ```bash
 file xxxx
 ```
 
-更改后缀名，可以将文件的原貌得出
+更改后缀名后可以看出文件的真实格式
 
-![文件类型的识别 · 图 13](../../../assets/images/CTF/image-9.png)
+![image-9](../../../assets/images/CTF/image-9.png)
 
 ```bash
 winhex //通过识别文件头，用于windows下的情况
@@ -168,17 +156,17 @@ winhex //通过识别文件头，用于windows下的情况
 010editor filename
 ```
 
-通过010编辑器打开文件，通过查看头文件的第一位16位数值来判断是什么文件
+通过010编辑器打开文件，通过查看文件头的十六进制数值来判断是什么文件
 
-![文件类型的识别 · 图 14](../../../assets/images/CTF/image-11.png)
+![image-11](../../../assets/images/CTF/image-11.png)
 
 ### 文件分离
 
-![文件分离 · 图 15](../../../assets/images/CTF/image-12.png)
+![image-12](../../../assets/images/CTF/image-12.png)
 
-![文件分离 · 图 16](../../../assets/images/CTF/image-13.png)
+![image-13](../../../assets/images/CTF/image-13.png)
 
-![文件分离 · 图 17](../../../assets/images/CTF/image-14.png)
+![image-14](../../../assets/images/CTF/image-14.png)
 
 - EX1
 - 1.txt:1234567890abcdefghjk
@@ -191,13 +179,13 @@ dd if=1.txt of=4.txt bs=5 count=1 skip=1
 
 4.txt:67890
 
-![文件分离 · 图 18](../../../assets/images/CTF/image-15.png)
+![image-15](../../../assets/images/CTF/image-15.png)
 
-![文件分离 · 图 19](../../../assets/images/CTF/image-16.png)
+![image-16](../../../assets/images/CTF/image-16.png)
 
 ### 文件合并
 
-![文件合并 · 图 20](../../../assets/images/CTF/image-17.png)
+![image-17](../../../assets/images/CTF/image-17.png)
 
 合并后还要根据md5来判断是否合并成功
 
@@ -217,18 +205,18 @@ dd if=1.txt of=4.txt bs=5 count=1 skip=1
 exiftool filename
 ```
 
-#### Steglove
+#### Stegsolve
 
-! [alt text](image-18.png)
-![Steglove · 图 21](../../../assets/images/CTF/image-19.png)
+![image-18](../../../assets/images/CTF/image-18.png)
+![image-19](../../../assets/images/CTF/image-19.png)
 
 #### 图片修复
 
 - 图片头修复
 - 尾修复
-- crc循环效验修复
+- CRC 循环校验修复
 - 长宽高修复
-![图片修复 · 图 22](../../../assets/images/CTF/image-34.png)
+![image-34](../../../assets/images/CTF/image-34.png)
 
 ```python
 import zlib
@@ -257,38 +245,38 @@ for h in range(1, 2000): # 假设高度在 2000 以内
 
 #### 最低位有效位LSB隐写
 
-- Stegslove可以用来处理LSB隐写，在DATA EXact中
+- Stegsolve可以用来处理LSB隐写，在DATA EXact中
 - 对于图像的RGB有8位，把信息隐藏在最后一位
 
-![最低位有效位LSB隐写 · 图 23](../../../assets/images/CTF/image-20.png)
+![image-20](../../../assets/images/CTF/image-20.png)
 
 对于pdf，bmp的
 
-![alt text](../../../assets/images/CTF/image-21.png)
+![image-21](../../../assets/images/CTF/image-21.png)
 
 图片残缺修复
 
-![最低位有效位LSB隐写 · 图 24](../../../assets/images/CTF/image-22.png)
+![image-22](../../../assets/images/CTF/image-22.png)
 
-![最低位有效位LSB隐写 · 图 25](../../../assets/images/CTF/image-22.png)
+![image-22](../../../assets/images/CTF/image-22.png)
 
 ##### PNG图像源文件含义
 
-![PNG图像源文件含义 · 图 26](../../../assets/images/CTF/image-24.png)
+![image-24](../../../assets/images/CTF/image-24.png)
 
 #### 图片加密
 
-![图片加密 · 图 27](../../../assets/images/CTF/image-25.png)
+![image-25](../../../assets/images/CTF/image-25.png)
 
-![图片加密 · 图 28](../../../assets/images/CTF/image-26.png)
+![image-26](../../../assets/images/CTF/image-26.png)
 
-![图片加密 · 图 29](../../../assets/images/CTF/image-27.png)
+![image-27](../../../assets/images/CTF/image-27.png)
 
-![图片加密 · 图 30](../../../assets/images/CTF/image-29.png)
+![image-29](../../../assets/images/CTF/image-29.png)
 
-![图片加密 · 图 31](../../../assets/images/CTF/image-28.png)
+![image-28](../../../assets/images/CTF/image-28.png)
 
-![图片加密 · 图 32](../../../assets/images/CTF/image-30.png)
+![image-30](../../../assets/images/CTF/image-30.png)
 
 - Stegdetect
 - outguess
@@ -298,7 +286,7 @@ for h in range(1, 2000): # 假设高度在 2000 以内
 
 #### 总结
 
-🧭 第一步：通用排查（适用于所有图片）
+**第一步：通用排查（适用于所有图片）**
 不管拿到什么图片，先用这几招过一遍，能筛掉一半的题：
 
 看真实类型：file 文件名。如果提示是 PNG 但后缀是 JPG，或者提示是 ZIP、RAR，直接改后缀或按相应格式处理（常有“图种”或修改文件头）.
@@ -311,7 +299,7 @@ for h in range(1, 2000): # 假设高度在 2000 以内
 
 十六进制查看：xxd 文件名 | head 或 xxd 文件名 | tail。看头部是否被修改（比如 PNG 头被改了），或者尾部是否有追加数据。
 
-🖼️ 第二步：按后缀精准打击
+**第二步：按后缀精准打击**
 1. JPG / JPEG 后缀
 JPG 是有损压缩，不适合做 LSB 隐写，所以常见的套路是“加密隐写”。
 
@@ -372,11 +360,11 @@ Stegsolve 帧浏览：在 Stegsolve 里用 Frame Browser 可以逐帧查看，�
 
 #### 伪加密
 
-如果压缩文件是加密的，或文件头正常但是解压失败，首先尝试文件是否位伪加密
+如果压缩文件是加密的，或文件头正常但是解压失败，首先尝试文件是否为伪加密
 
-zip文件是否加密由标识符显示，再每个文件的目录有一位专门来表示是否加密，将其设置为00表示未加密
+zip文件是否加密由标识符显示，在每个文件的目录项中有一位专门来表示是否加密，将其设置为00表示未加密
 
-如果这时候解压成功了，说明是伪加密，否正出错为真加密
+如果这时候解压成功了，说明是伪加密，否则说明为真加密
 
 用16进制编辑器进入后，搜索504B0102，后的第5，6个字符，改成0000
 
@@ -387,26 +375,26 @@ rar的话是第24位的尾数改为0，4是加密
 - 利用ARCHPR工具（F:/CTFtools/Arc）
 - 已知前几位
 
-![暴力破解 · 图 33](../../../assets/images/CTF/image-32.png)
+![image-32](../../../assets/images/CTF/image-32.png)
 
 #### 哈希对比
 
 工具zip2John
 
-![哈希对比 · 图 34](../../../assets/images/CTF/image-45.png)
+![image-45](../../../assets/images/CTF/image-45.png)
 
 #### 明文攻击
 
 - 知道加密的zip中的部分明文内容，利用这些内容推测出密钥并解密zip
 - 相比于暴力，这种在破解比较复杂的压缩包时效率更高
 
-![明文攻击 · 图 35](../../../assets/images/CTF/image-33.png)
+![image-33](../../../assets/images/CTF/image-33.png)
 
 tips：明文压缩的算法和加密的压缩算法一样
 
 ### 流量取证
 
-![流量取证 · 图 36](../../../assets/images/CTF/image-35.png)
+![image-35](../../../assets/images/CTF/image-35.png)
 
 #### wireshark
 
@@ -414,14 +402,14 @@ tips：明文压缩的算法和加密的压缩算法一样
 
 源ip或者目的ip
 
-```wireshark
+```text
 ip.src eq x.x.x.x or ip.dst eq x.x.x.x  
 ip.addr eq x.x.x.x
 ```
 
 过滤http
 
-```wireshark
+```text
 tcp.port eq 80 or udp.port eq 80   
 tcp.dstport == 80 //tcp目的端口为80
 tcp.srcport == 80 //tcp源端口为80
@@ -431,17 +419,17 @@ tcp.port >= 1 and tcp.port <= 80
 - 过滤协议tcp/udp/arp/icmp
 - 过滤MAC
 
-```wireshark
+```text
 eth.dst == xx:xx:xx:xx:xx:xx 过滤目标
 ```
 
-![过滤指令 · 图 37](../../../assets/images/CTF/image-36.png)
+![image-36](../../../assets/images/CTF/image-36.png)
 
 http模式过滤
 
-![alt text](../../../assets/images/CTF/image-37.png)
+![image-37](../../../assets/images/CTF/image-37.png)
 
-```wireshark
+```text
 http.request.method == "GET"
 http.request.method == "POST"
 http.request.uri ==" "
@@ -462,11 +450,11 @@ tcp contains 'flag'
 
 根据数据包的特征筛选
 
-![解题过程 · 图 38](../../../assets/images/CTF/image-38.png)
+![image-38](../../../assets/images/CTF/image-38.png)
 
 流汇聚
 
-![解题过程 · 图 39](../../../assets/images/CTF/image-39.png)
+![image-39](../../../assets/images/CTF/image-39.png)
 
 在关注的数据报中进行流汇聚可以还原成数据
 
@@ -478,16 +466,16 @@ tcp contains 'flag'
 
 wireshark里面可以进行数据提取自动提取http传输的文件内容
 
-![解题过程 · 图 40](../../../assets/images/CTF/image-40.png)
+![image-40](../../../assets/images/CTF/image-40.png)
 
 导出单个分组的字节流
 
-![解题过程 · 图 41](../../../assets/images/CTF/image-41.png)
+![image-41](../../../assets/images/CTF/image-41.png)
 
 ##### WIFI流量的分析
 
 - kali中利用aircrack-ng xxx.cap进行无线密码破解
-- wifi加密WPA， WEQ ， WPA2
+- wifi加密WPA， WEP ， WPA2
 - aircrack-ng xxx.cap -w pass.txt
 
 ##### USB流量分析
@@ -496,14 +484,14 @@ wireshark里面可以进行数据提取自动提取http传输的文件内容
 
 USB协议数据部分在Leftover Capture Data中
 
-![USB流量分析 · 图 42](../../../assets/images/CTF/image-42.png)
+![image-42](../../../assets/images/CTF/image-42.png)
 
-键盘数据包的长度为8个字节，击键星系在第三个字节，而每次key stroke都会产生一个keyboard event usb packet
+键盘数据包的长度为8个字节，击键信息在第三个字节，而每次key stroke都会产生一个keyboard event usb packet
 
 - 提取data方法
 - 1，导出为CSV（不好用）
 
-![USB流量分析 · 图 43](../../../assets/images/CTF/image-43.png)
+![image-43](../../../assets/images/CTF/image-43.png)
 
 2，tshark，将lcd的数据单独复制出来
 
@@ -514,7 +502,7 @@ tshark -r usb1.pcap$目的文件$ -T fields -e usb,capdata > usbdata.txt$写出�
 ##### COTP协议
 
 - COTP
-- 可以理解为基于TCP的工控TCP，主要有五种类 型：
+- 可以理解为基于TCP的工控TCP，主要有五种类型：
 - CR Connect Request (0x0e)——握手，发送方发送
 - CC Connect Confirm (0x0d)——握手，接收方发送
 - DT Data (0x0f)——传正常数据
@@ -529,7 +517,7 @@ http://www.efittech.com/hxdec.aspx
 
 汉信码
 
-![COTP协议 · 图 44](../../../assets/images/CTF/image-55.png)
+![image-55](../../../assets/images/CTF/image-55.png)
 
 - 密文有斜杠可能是rabbit加密
 - 解密网址
@@ -537,7 +525,7 @@ http://www.efittech.com/hxdec.aspx
 
 PNG头文件base64加密后
 
-![COTP协议 · 图 45](../../../assets/images/CTF/image-56.png)
+![image-56](../../../assets/images/CTF/image-56.png)
 
 ## MISC真题演练
 
@@ -547,56 +535,56 @@ PNG头文件base64加密后
 
 #&的大概率时html编码
 
-![这是一张单纯的图片 · 图 46](../../../assets/images/CTF/image-57.png)
+![image-57](../../../assets/images/CTF/image-57.png)
 
 #### linux
 
 直接拖入工具台
 
-![linux · 图 47](../../../assets/images/CTF/image-58.png)
+![image-58](../../../assets/images/CTF/image-58.png)
 
 #### 隐写
 
 png高度被修改
 
-![隐写 · 图 48](../../../assets/images/CTF/image-59.png)
+![image-59](../../../assets/images/CTF/image-59.png)
 
 #### talent
 
 在工具台中过滤flag
 
-![talent · 图 49](../../../assets/images/CTF/image-60.png)
+![image-60](../../../assets/images/CTF/image-60.png)
 
 #### 眼见非实
 
-- 发现是zip，改一下啊后缀
+- 发现是 ZIP，改一下后缀
 - 解压，一个文件一个文件找
 
-![眼见非实 · 图 50](../../../assets/images/CTF/image-62.png)
+![image-62](../../../assets/images/CTF/image-62.png)
 
-#### 多种发发解决
+#### 多种方法解决
 
 工作台中发现是base64编码的，转一下图片
 
-![多种发发解决 · 图 51](../../../assets/images/CTF/image-63.png)
+![image-63](../../../assets/images/CTF/image-63.png)
 
 转出来是二维码，扫一下
 
-![多种发发解决 · 图 52](../../../assets/images/CTF/image-64.png)
+![image-64](../../../assets/images/CTF/image-64.png)
 
 #### linux2
 
 导入工作台，直接得出
 
-![linux2 · 图 53](../../../assets/images/CTF/image-65.png)
+![image-65](../../../assets/images/CTF/image-65.png)
 
 #### 又一个单纯图片
 
 放入工具台发现又隐含文件
 
-![又一个单纯图片 · 图 54](../../../assets/images/CTF/image-66.png)
+![image-66](../../../assets/images/CTF/image-66.png)
 
-![又一个单纯图片 · 图 55](../../../assets/images/CTF/image-67.png)
+![image-67](../../../assets/images/CTF/image-67.png)
 
 #### 闪的好快
 
@@ -604,21 +592,21 @@ png高度被修改
 - 在工作台中分离，发现有18个二维码
 - 进入工作台批量扫码
 
-![闪的好快 · 图 56](../../../assets/images/CTF/image-68.png)
+![image-68](../../../assets/images/CTF/image-68.png)
 
 #### 宽带用户
 
 - 导入工作台，进入路由取证
 - 搜索username
 
-![宽带用户 · 图 57](../../../assets/images/CTF/image-68.png)
+![image-68](../../../assets/images/CTF/image-68.png)
 
 #### 逆向入门
 
 - 导入工作台，查看16进制发现是base64的编码
 - 转图像
 
-![逆向入门 · 图 58](../../../assets/images/CTF/image-70.png)
+![image-70](../../../assets/images/CTF/image-70.png)
 
 #### spilt_all
 
@@ -626,13 +614,13 @@ png高度被修改
 
 再将切片分离并拼接
 
-![spilt_all · 图 59](../../../assets/images/CTF/image-71.png)
+![image-71](../../../assets/images/CTF/image-71.png)
 
 #### 薛定谔的猫
 
-打开16进制擦看起，发现有py代码
+打开16进制查看起，发现有py代码
 
-![薛定谔的猫 · 图 60](../../../assets/images/CTF/image-72.png)
+![image-72](../../../assets/images/CTF/image-72.png)
 
 导出，运行得到flag.txt
 
@@ -640,16 +628,16 @@ png高度被修改
 
 - 图片尾部有附加数据，分离出来
 - 转ascii码发现是二维坐标，导入一下
-- 转化位二位码
+- 转换为二维码
 
-![图穷匕见 · 图 61](../../../assets/images/CTF/image-73.png)
+![image-73](../../../assets/images/CTF/image-73.png)
 
 #### 0和1的故事
 
 - 载入工作台发现，全是01
 - 转化为二维码，补全一下
 
-![0和1的故事 · 图 62](../../../assets/images/CTF/image-74.png)
+![image-74](../../../assets/images/CTF/image-74.png)
 
 #### 赛博朋克
 
@@ -658,38 +646,38 @@ png高度被修改
 - 发现里面有个txt,其实是png
 - 修改之后查看隐写
 
-![赛博朋克 · 图 63](../../../assets/images/CTF/image-75.png)
+![image-75](../../../assets/images/CTF/image-75.png)
 
-![赛博朋克 · 图 64](../../../assets/images/CTF/image-76.png)
+![image-76](../../../assets/images/CTF/image-76.png)
 
 #### 隐写2
 
 - 题目是个png，放入工作台发现有尾巴
 - 提取一下
 
-![隐写2 · 图 65](../../../assets/images/CTF/image-77.png)
+![image-77](../../../assets/images/CTF/image-77.png)
 
 提取之后发现是个zip
 
-![alt text](../../../assets/images/CTF/image-78.png)
+![image-78](../../../assets/images/CTF/image-78.png)
 
 #### LOOK
 
 放入工作台发现可以是zip
 
-![LOOK · 图 66](../../../assets/images/CTF/image-79.png)
+![image-79](../../../assets/images/CTF/image-79.png)
 
 - 解压一下
 - 发现是bmp，考虑隐写，启动zsteg
 - 找到了
 
-![LOOK · 图 67](../../../assets/images/CTF/image-80.png)
+![image-80](../../../assets/images/CTF/image-80.png)
 
 #### 选择跳跃
 
 mps隐写，密码是syclovergreek
 
-![选择跳跃 · 图 68](../../../assets/images/CTF/image-81.png)
+![image-81](../../../assets/images/CTF/image-81.png)
 
 #### ping
 
@@ -697,109 +685,109 @@ mps隐写，密码是syclovergreek
 
 flag{dc76a1eee6e3822877ed627e0a04ab4a}
 
-![ping · 图 69](../../../assets/images/CTF/image-82.png)
+![image-82](../../../assets/images/CTF/image-82.png)
 
-![ping · 图 70](../../../assets/images/CTF/image-83.png)
+![image-83](../../../assets/images/CTF/image-83.png)
 
-![ping · 图 71](../../../assets/images/CTF/image-84.png)
+![image-84](../../../assets/images/CTF/image-84.png)
 
 #### 蹭网密码
 
-![蹭网密码 · 图 72](../../../assets/images/CTF/image-87.png)
+![image-87](../../../assets/images/CTF/image-87.png)
 
-![蹭网密码 · 图 73](../../../assets/images/CTF/image-85.png)
+![image-85](../../../assets/images/CTF/image-85.png)
 
-![蹭网密码 · 图 74](../../../assets/images/CTF/image-86.png)
+![image-86](../../../assets/images/CTF/image-86.png)
 
 #### usb流量
 
 - 放入工作台
 - 进入usb专项
 
-![usb流量 · 图 75](../../../assets/images/CTF/image-88.png)
+![image-88](../../../assets/images/CTF/image-88.png)
 
 #### 普通的二维码
 
 bmp，考虑一下隐写和尾部
 
-![普通的二维码 · 图 76](../../../assets/images/CTF/image-89.png)
+![image-89](../../../assets/images/CTF/image-89.png)
 
 - 有点像8进制
 - 转化为ascii
 
-![普通的二维码 · 图 77](../../../assets/images/CTF/image-90.png)
+![image-90](../../../assets/images/CTF/image-90.png)
 
 #### 简单取证
 
-![简单取证 · 图 78](../../../assets/images/CTF/image-91.png)
+![image-91](../../../assets/images/CTF/image-91.png)
 
-![简单取证 · 图 79](../../../assets/images/CTF/image-92.png)
+![image-92](../../../assets/images/CTF/image-92.png)
 
-![简单取证 · 图 80](../../../assets/images/CTF/image-93.png)
+![image-93](../../../assets/images/CTF/image-93.png)
 
 #### blind injection
 
-![blind injection · 图 81](../../../assets/images/CTF/image-94.png)
+![image-94](../../../assets/images/CTF/image-94.png)
 
 #### 超简单隐写
 
-![超简单隐写 · 图 82](../../../assets/images/CTF/image-95.png)
+![image-95](../../../assets/images/CTF/image-95.png)
 
 两个相同的图片，考虑盲水印
 
-![超简单隐写 · 图 83](../../../assets/images/CTF/image-96.png)
+![image-96](../../../assets/images/CTF/image-96.png)
 
 得到一个密码
 
-![超简单隐写 · 图 84](../../../assets/images/CTF/image-97.png)
+![image-97](../../../assets/images/CTF/image-97.png)
 
 解压出passwd.txt
 
-![超简单隐写 · 图 85](../../../assets/images/CTF/image-98.png)
+![image-98](../../../assets/images/CTF/image-98.png)
 
 发现是base64的编码，转图像出不来
 
 **解码:**
 
-![超简单隐写 · 图 86](../../../assets/images/CTF/image-99.png)
+![image-99](../../../assets/images/CTF/image-99.png)
 
 - 乱码
 - 考虑base64隐写
 
-![超简单隐写 · 图 87](../../../assets/images/CTF/image-100.png)
+![image-100](../../../assets/images/CTF/image-100.png)
 
 flag的密码出来了
 
-![超简单隐写 · 图 88](../../../assets/images/CTF/image-101.png)
+![image-101](../../../assets/images/CTF/image-101.png)
 
 #### 阿达
 
 放入工作台发现有尾部的压缩包
 
-![阿达 · 图 89](../../../assets/images/CTF/image-135.png)
+![image-135](../../../assets/images/CTF/image-135.png)
 
 - flag在里面，加密的
 - 发现图片exif的相机名字很奇怪
 
-![阿达 · 图 90](../../../assets/images/CTF/image-136.png)
+![image-136](../../../assets/images/CTF/image-136.png)
 
 发现不超过16，考虑hex
 
-![阿达 · 图 91](../../../assets/images/CTF/image-137.png)
+![image-137](../../../assets/images/CTF/image-137.png)
 
-![阿达 · 图 92](../../../assets/images/CTF/image-138.png)
+![image-138](../../../assets/images/CTF/image-138.png)
 
 #### 贝斯手
 
 直接爆破
 
-![贝斯手 · 图 93](../../../assets/images/CTF/image-139.png)
+![image-139](../../../assets/images/CTF/image-139.png)
 
 5+58说明，5为MD5加密，58为base58
 
-![贝斯手 · 图 94](../../../assets/images/CTF/image-140.png)
+![image-140](../../../assets/images/CTF/image-140.png)
 
-![贝斯手 · 图 95](../../../assets/images/CTF/image-141.png)
+![image-141](../../../assets/images/CTF/image-141.png)
 
 ### CTFHub
 
@@ -807,15 +795,15 @@ flag的密码出来了
 
 flag藏在exif中
 
-![相机制造商 · 图 96](../../../assets/images/CTF/image-102.png)
+![image-102](../../../assets/images/CTF/image-102.png)
 
 #### word文件的本质
 
 word文件本质上，是一个压缩包，是可以被分离出来的
 
-![word文件的本质 · 图 97](../../../assets/images/CTF/image-103.png)
+![image-103](../../../assets/images/CTF/image-103.png)
 
-![word文件的本质 · 图 98](../../../assets/images/CTF/image-104.png)
+![image-104](../../../assets/images/CTF/image-104.png)
 
 分离出flag.xml
 
@@ -823,12 +811,12 @@ word文件本质上，是一个压缩包，是可以被分离出来的
 
 4位数密码
 
-![just a rar · 图 99](../../../assets/images/CTF/image-105.png)
+![image-105](../../../assets/images/CTF/image-105.png)
 
-- 解压初图片放入工作台
+- 解压出图片放入工作台
 - 找到flag
 
-![just a rar · 图 100](../../../assets/images/CTF/image-107.png)
+![image-107](../../../assets/images/CTF/image-107.png)
 
 #### 你猜猜我是个啥
 
@@ -836,146 +824,214 @@ word文件本质上，是一个压缩包，是可以被分离出来的
 - 发现是个png，改一下
 - 发现是个二维码，扫出来很猎奇
 
-![你猜猜我是个啥 · 图 101](../../../assets/images/CTF/image-108.png)
+![image-108](../../../assets/images/CTF/image-108.png)
 
 原来在文件里
 
-![你猜猜我是个啥 · 图 102](../../../assets/images/CTF/image-109.png)
+![image-109](../../../assets/images/CTF/image-109.png)
 
 #### 签个道
 
 - zip文件损坏，放入工作台
 - 发现是png，改完发现是二维码扫一下
 
-![签个道 · 图 103](../../../assets/images/CTF/image-110.png)
+![image-110](../../../assets/images/CTF/image-110.png)
 
 #### 藏藏藏
 
-- 是个jpq，发现尾部有数据
+- 是个jpg，发现尾部有数据
 - 导出，解压
 
-![藏藏藏 · 图 104](../../../assets/images/CTF/image-111.png)
+![image-111](../../../assets/images/CTF/image-111.png)
 
 binwalk分离一下
 
-![藏藏藏 · 图 105](../../../assets/images/CTF/image-112.png)
+![image-112](../../../assets/images/CTF/image-112.png)
 
 找一找，找到了
 
-![藏藏藏 · 图 106](../../../assets/images/CTF/image-113.png)
+![image-113](../../../assets/images/CTF/image-113.png)
 
 #### 认真你就输了
 
 是一个xls，binwalk直接分离
 
-![认真你就输了 · 图 107](../../../assets/images/CTF/image-114.png)
+![image-114](../../../assets/images/CTF/image-114.png)
 
 耶耶耶
 
-![认真你就输了 · 图 108](../../../assets/images/CTF/image-115.png)
+![image-115](../../../assets/images/CTF/image-115.png)
 
 #### 蛛丝马迹
 
-![蛛丝马迹 · 图 109](../../../assets/images/CTF/image-116.png)
+![image-116](../../../assets/images/CTF/image-116.png)
 
-![蛛丝马迹 · 图 110](../../../assets/images/CTF/image-117.png)
+![image-117](../../../assets/images/CTF/image-117.png)
 
 #### hidden
 
 导入工作台，发现尾部有残留
 
-![hidden · 图 111](../../../assets/images/CTF/image-118.png)
+![image-118](../../../assets/images/CTF/image-118.png)
 
 导出，看头文件是个zip
 
-![hidden · 图 112](../../../assets/images/CTF/image-119.png)
+![image-119](../../../assets/images/CTF/image-119.png)
 
 加密的，看是不是伪加密
 
-![hidden · 图 113](../../../assets/images/CTF/image-120.png)
+![image-120](../../../assets/images/CTF/image-120.png)
 
 看来不是，暴力一下
 
-![hidden · 图 114](../../../assets/images/CTF/image-121.png)
+![image-121](../../../assets/images/CTF/image-121.png)
 
 解压出来图片还是坏的
 
-![hidden · 图 115](../../../assets/images/CTF/image-122.png)
+![image-122](../../../assets/images/CTF/image-122.png)
 
 crc修复一下
 
-![hidden · 图 116](../../../assets/images/CTF/image-123.png)
+![image-123](../../../assets/images/CTF/image-123.png)
 
 扫码一下
 
-![hidden · 图 117](../../../assets/images/CTF/image-124.png)
+![image-124](../../../assets/images/CTF/image-124.png)
 
 #### 及你太美
 
 一张坏的图片，一张好的
 
-![及你太美 · 图 118](../../../assets/images/CTF/image-125.png)
+![image-125](../../../assets/images/CTF/image-125.png)
 
-![及你太美 · 图 119](../../../assets/images/CTF/image-126.png)
+![image-126](../../../assets/images/CTF/image-126.png)
 
 写入一下头文件
 
-![及你太美 · 图 120](../../../assets/images/CTF/image-127.png)
+![image-127](../../../assets/images/CTF/image-127.png)
 
 #### taowa
 
 一直点，写在最后一个图片里面了
 
-![taowa · 图 121](../../../assets/images/CTF/image-128.png)
+![image-128](../../../assets/images/CTF/image-128.png)
 
 #### 一叶障目
 
-crc错误，修复一下啊
+crc错误，修复一下
 
-![一叶障目 · 图 122](../../../assets/images/CTF/image-129.png)
+![image-129](../../../assets/images/CTF/image-129.png)
 
 修好了
 
-![一叶障目 · 图 123](../../../assets/images/CTF/image-130.png)
+![image-130](../../../assets/images/CTF/image-130.png)
 
 #### minified
 
 提取不出任何有效信息
 
-![minified · 图 124](../../../assets/images/CTF/image-131.png)
+![image-131](../../../assets/images/CTF/image-131.png)
 
 发现red的通道为全黑，考虑一下0通道问题
 
-![minified · 图 125](../../../assets/images/CTF/image-133.png)
+![image-133](../../../assets/images/CTF/image-133.png)
 
-![minified · 图 126](../../../assets/images/CTF/image-132.png)
+![image-132](../../../assets/images/CTF/image-132.png)
 
 分别对每个0通道进行xor操作
 
-![minified · 图 127](../../../assets/images/CTF/image-134.png)
+![image-134](../../../assets/images/CTF/image-134.png)
 
 #### 键盘
 
 有一个zip，检查一下是不是伪加密
 
-![键盘 · 图 128](../../../assets/images/CTF/image-142.png)
+![image-142](../../../assets/images/CTF/image-142.png)
 
 docx需要密码
 
-![键盘 · 图 129](../../../assets/images/CTF/image-143.png)
+![image-143](../../../assets/images/CTF/image-143.png)
 
 对应键盘上的
 
-![键盘 · 图 130](../../../assets/images/CTF/image-144.png)
+![image-144](../../../assets/images/CTF/image-144.png)
 
-![键盘 · 图 131](../../../assets/images/CTF/image-145.png)
+![image-145](../../../assets/images/CTF/image-145.png)
 
 #### 简单的隐写
 
 放入工具台，发现尾部数据有问题，像是base32
 
-![简单的隐写 · 图 132](../../../assets/images/CTF/image-146.png)
+![image-146](../../../assets/images/CTF/image-146.png)
 
-![简单的隐写 · 图 133](../../../assets/images/CTF/image-147.png)
+![image-147](../../../assets/images/CTF/image-147.png)
+## 简单的套娃  
+打开文件发现有两个jpg文件头，导出下面的
+![Pasted image 20261106220117](../../../assets/images/根目录/Pasted%20image%2020261106220117.png)
+![Pasted image 20261106220238](../../../assets/images/根目录/Pasted%20image%2020261106220238.png)
+## DISORDER——ZIP 
+一开始打开不了
+载入分析一下
+可能是头文件缺失插入后  
+![Pasted image 20261106222327](../../../assets/images/根目录/Pasted%20image%2020261106222327.png)
+分离一下
+![Pasted image 20261106222648](../../../assets/images/根目录/Pasted%20image%2020261106222648.png)
+![Pasted image 20261106224153](../../../assets/images/根目录/Pasted%20image%2020261106224153.png)
+![Pasted image 20261106224413](../../../assets/images/根目录/Pasted%20image%2020261106224413.png)
+![Pasted image 20261106224853](../../../assets/images/根目录/Pasted%20image%2020261106224853.png)
+使用wbstego继续pdf隐写
+![Pasted image 20261106230352](../../../assets/images/根目录/Pasted%20image%2020261106230352.png)
+## 简单的MQTT
+是一个pacp的包
+![Pasted image 20261106231609](../../../assets/images/根目录/Pasted%20image%2020261106231609.png)
+22行发现密码
+521开头的压缩包
+![Pasted image 20261106231706](../../../assets/images/根目录/Pasted%20image%2020261106231706.png)
+导出成rar
+![Pasted image 20261106231959](../../../assets/images/根目录/Pasted%20image%2020261106231959.png)
+## 暴力破解
+如题
+![Pasted image 20261106234035](../../../assets/images/根目录/Pasted%20image%2020261106234035.png)
+![Pasted image 20261106234215](../../../assets/images/根目录/Pasted%20image%2020261106234215.png)
+![Pasted image 20261106234329](../../../assets/images/根目录/Pasted%20image%2020261106234329.png)
+word 文字隐写
+![Pasted image 20261106234354](../../../assets/images/根目录/Pasted%20image%2020261106234354.png)
+## 磁盘恢复
+直接命中
+![Pasted image 20261106234722](../../../assets/images/根目录/Pasted%20image%2020261106234722.png)
+## misc2
+![Pasted image 20261106235340](../../../assets/images/根目录/Pasted%20image%2020261106235340.png)
+![Pasted image 20261106235404](../../../assets/images/根目录/Pasted%20image%2020261106235404.png)
+## loop
 
-<!-- migrated-from: D:/Blog/docs/03-Linux与网络安全/CTF/CTF-入门与题型总览.md -->
+循环解压脚本
+![Pasted image 20261107000736](../../../assets/images/根目录/Pasted%20image%2020261107000736.png)
+
+## 流量包分析
+![Pasted image 20261107091500](../../../assets/images/根目录/Pasted%20image%2020261107091500.png)
+![Pasted image 20261107091544](../../../assets/images/根目录/Pasted%20image%2020261107091544.png)
+![Pasted image 20261107092238](../../../assets/images/根目录/Pasted%20image%2020261107092238.png)
+## gif文件修复
+![Pasted image 20261107093802](../../../assets/images/根目录/Pasted%20image%2020261107093802.png)
+![Pasted image 20261107094209](../../../assets/images/根目录/Pasted%20image%2020261107094209.png)
+![Pasted image 20261107094219](../../../assets/images/根目录/Pasted%20image%2020261107094219.png)
+## 隐写2
+
+![Pasted image 20261107100608](../../../assets/images/根目录/Pasted%20image%2020261107100608.png)
+![Pasted image 20261107100708](../../../assets/images/根目录/Pasted%20image%2020261107100708.png)
+<img src="../../../assets/images/根目录/Pasted%20image%2020261107100852.png" alt="Pasted image 20261107100852" width="366"><img src="../../../assets/images/根目录/Pasted%20image%2020261107101001.png" alt="Pasted image 20261107101001" width="497">
+转二维码
+**![Pasted image 20261107101041](../../../assets/images/根目录/Pasted%20image%2020261107101041.png)
+## 文件修复
+![Pasted image 20261107101645](../../../assets/images/根目录/Pasted%20image%2020261107101645.png)
+直接梭哈
+## PAnda
+![Pasted image 20261107102528](../../../assets/images/根目录/Pasted%20image%2020261107102528.png)
+
+## 相关笔记
+
+- CTF 知识地图
+- Linux 知识地图
+- 总知识地图
+
+<!-- vault-sync: 由 D:/library/nico 自动同步，请勿在博客侧手工编辑 -->

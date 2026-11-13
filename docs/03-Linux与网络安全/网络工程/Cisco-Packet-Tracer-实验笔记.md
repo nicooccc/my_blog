@@ -1,3 +1,4 @@
+<!-- synced-from-vault: 04-Linux与网络安全/Cisco Packet Tracer 实验.md | updated: 2026-11-06 -->
 # Cisco Packet Tracer 实验笔记
 
 <!-- guide-start -->
@@ -20,26 +21,26 @@
 
 ### 网络设备
 
- ![alt text](../../../assets/images/Cisco_packet_trace/image.png)
+![image](../../../assets/images/Cisco_packet_trace/image.png)
 
 ### 终端设备
 
- ![alt text](../../../assets/images/Cisco_packet_trace/image-1.png)
+![image-1](../../../assets/images/Cisco_packet_trace/image-1.png)
 
 ### 接口
 
- ![alt text](../../../assets/images/Cisco_packet_trace/image-2.png)
+![image-2](../../../assets/images/Cisco_packet_trace/image-2.png)
 
 ### 物理界面
 
- ![alt text](../../../assets/images/Cisco_packet_trace/image-3.png)
+![image-3](../../../assets/images/Cisco_packet_trace/image-3.png)
  可以右键来管理线缆
 - Shift + P 切换物理模式
 - Shift + L 切换逻辑模式
 
-![物理界面 · 图 1](../../../assets/images/Cisco_packet_trace/image-4.png)
+![image-4](../../../assets/images/Cisco_packet_trace/image-4.png)
 
-![物理界面 · 图 2](../../../assets/images/Cisco_packet_trace/image-5.png)
+![image-5](../../../assets/images/Cisco_packet_trace/image-5.png)
 
 ### 点对点
 
@@ -48,7 +49,7 @@
 
 在小型网络中，许多计算机在网络中即是，又是服务器又是客户段，这被称为对等网络
 
-![点对点 · 图 3](../../../assets/images/Cisco_packet_trace/image-6.png)
+![image-6](../../../assets/images/Cisco_packet_trace/image-6.png)
 
 ### 终端设备
 
@@ -56,23 +57,23 @@
 
 都有一个地址，当一台终端设备发起通信的时候，会使用目的终端设备的地址来指定消息发到哪里去
 
-![终端设备 · 图 4](../../../assets/images/Cisco_packet_trace/image-7.png)
+![image-7](../../../assets/images/Cisco_packet_trace/image-7.png)
 
 ### 中间设备
 
-![中间设备 · 图 5](../../../assets/images/Cisco_packet_trace/image-8.png)
+![image-8](../../../assets/images/Cisco_packet_trace/image-8.png)
 
 ### 网络介质
 
-![网络介质 · 图 6](../../../assets/images/Cisco_packet_trace/image-9.png)
+![image-9](../../../assets/images/Cisco_packet_trace/image-9.png)
 
 ### 网络表示
 
 方便理解
 
-![网络表示 · 图 7](../../../assets/images/Cisco_packet_trace/image-10.png)
+![image-10](../../../assets/images/Cisco_packet_trace/image-10.png)
 
-网络接口（网卡INC）：将设备物理连接到网络。
+网络接口（网卡 NIC）：将设备物理连接到网络。
 
 - 物理端口：物理设备上的接口或插口
 - 接口：网络设备上连接到独立网络的专用端口，在路由器上也成为网络接口
@@ -81,11 +82,11 @@
 
 物理拓扑
 
-![拓扑 · 图 8](../../../assets/images/Cisco_packet_trace/image-11.png)
+![image-11](../../../assets/images/Cisco_packet_trace/image-11.png)
 
-罗技拓扑
+逻辑拓扑
 
-![拓扑 · 图 9](../../../assets/images/Cisco_packet_trace/image-12.png)
+![image-12](../../../assets/images/Cisco_packet_trace/image-12.png)
 
 LAN局域网：覆盖范围较小
 WAN广域网：由多lan组成
@@ -96,26 +97,26 @@ WAN广域网：由多lan组成
 - 先输入enable进入Switch的管理界面#
 
 ```bash
-configure terminal //进入全局配置界面
-eixt //返回上一级
+configure terminal  ! 进入全局配置模式
+exit  ! 返回上一级
 line console 0 //进入子路配置模式
 end //返回到普通模式
 ctrl + Z
 ```
 
-![terminal · 图 10](../../../assets/images/Cisco_packet_trace/image-13.png)
+![image-13](../../../assets/images/Cisco_packet_trace/image-13.png)
 
 ### 基本的IOS命令结构
 
-![基本的IOS命令结构 · 图 11](../../../assets/images/Cisco_packet_trace/image-14.png)
+![image-14](../../../assets/images/Cisco_packet_trace/image-14.png)
 
 ### Cli的指令热键
 
-![Cli的指令热键 · 图 12](../../../assets/images/Cisco_packet_trace/image-15.png)
+![image-15](../../../assets/images/Cisco_packet_trace/image-15.png)
 
 ### 设备名称
 
-- 以数字开头
+- 以字母开头（原笔记记为「以数字开头」，按 Cisco IOS 命名规则改正，待复核）
 - 不包含空格
 - 以字母或数字结尾
 - 仅使用字母，数字和波折号
@@ -124,15 +125,15 @@ ctrl + Z
 
 保护用户EXEC模式安全
 
-![配置密码 · 图 13](../../../assets/images/Cisco_packet_trace/image-16.png)
+![image-16](../../../assets/images/Cisco_packet_trace/image-16.png)
 
 保护特权EXEC模式安全
 
-![配置密码 · 图 14](../../../assets/images/Cisco_packet_trace/image-17.png)
+![image-17](../../../assets/images/Cisco_packet_trace/image-17.png)
 
 保护VTY线路的示例
 
-![配置密码 · 图 15](../../../assets/images/Cisco_packet_trace/image-18.png)
+![image-18](../../../assets/images/Cisco_packet_trace/image-18.png)
 
 ```bash
 configure terminal
@@ -141,7 +142,7 @@ service password-encryption //加密密码
 
 查看加密
 
-![配置密码 · 图 16](../../../assets/images/Cisco_packet_trace/image-19.png)
+![image-19](../../../assets/images/Cisco_packet_trace/image-19.png)
 
 ### 横幅消息
 
@@ -151,7 +152,7 @@ banner motd #xxx内容#
 
 #### startup-config(启动配置文件)
 
-启动或重启后不消失，存储再NVRAM中
+启动或重启后不消失，存储在 NVRAM 中
 
 ```bash
 show startup-config
@@ -159,7 +160,7 @@ show startup-config
 
 #### running-config(运行配置文件)
 
-存储再ram中，重启后或启动消失
+存储在 RAM 中，重启后或启动消失
 
 ```bash
 show running-config
@@ -167,7 +168,7 @@ show running-config
 
 ### 修改配置
 
-![修改配置 · 图 17](../../../assets/images/Cisco_packet_trace/image-20.png)
+![image-20](../../../assets/images/Cisco_packet_trace/image-20.png)
 
 ```bash
 copy running-config startup-config  //将目前的配置保存到启动的配置  还可以用来返回上一次配置  
@@ -179,30 +180,30 @@ reload //这次启动将恢复默认
 
 ### 2.6端口和地址
 
-#### .1IP地址
+#### IP 地址
 
 - IPV4地址，32位，要设置子网掩码，便于区分子网
 - IPV6地址，128位，不区分大小写
 
-#### .2接口和端口
+#### 接口和端口
 
-![.2接口和端口 · 图 18](../../../assets/images/Cisco_packet_trace/image-21.png)
+![image-21](../../../assets/images/Cisco_packet_trace/image-21.png)
 
 ### 2.7配置IP地址
 
 DHCP自动配置
 
-#### .4交换机虚拟接口配置
+#### 交换机虚拟接口配置（SVI）
 
-![.4交换机虚拟接口配置 · 图 19](../../../assets/images/Cisco_packet_trace/image-22.png)
+![image-22](../../../assets/images/Cisco_packet_trace/image-22.png)
 
-### 2.8.1测试配置接口
+### 测试配置接口
 
 ```bash
 show ip interface brief  //查看接口ip
 ```
 
-![2.8.1测试配置接口 · 图 20](../../../assets/images/Cisco_packet_trace/image-23.png)
+![image-23](../../../assets/images/Cisco_packet_trace/image-23.png)
 
 想要配置交换机的Vlan IP
 
@@ -214,13 +215,13 @@ ip address xxx.xxx.xxx.xxx xxx.xxx.xxx.xxx
 no shutdown
 ```
 
-```bash pC
+```bash
 ping xxx.xxx.xxx.xxx
 ```
 
 ### 2.9总结
 
-![2.9总结 · 图 21](../../../assets/images/Cisco_packet_trace/image-24.png)
+![image-24](../../../assets/images/Cisco_packet_trace/image-24.png)
 
 ### 3.1.2通信基础知识
 
@@ -236,87 +237,87 @@ ping xxx.xxx.xxx.xxx
 
 消息的格式和封装：将消息封装在数据包中传输，数据包的格式
 
-![3.1.5网络协议要求 · 图 22](../../../assets/images/Cisco_packet_trace/image-25.png)
+![image-25](../../../assets/images/Cisco_packet_trace/image-25.png)
 
 消息大小：要进行分组传输
 
 **消息的时序：**
 
-![alt text](../../../assets/images/Cisco_packet_trace/image-26.png)
+![image-26](../../../assets/images/Cisco_packet_trace/image-26.png)
 
 消息传输选项
 
-![alt text](../../../assets/images/Cisco_packet_trace/image-27.png)
+![image-27](../../../assets/images/Cisco_packet_trace/image-27.png)
 
 #### 网络协议
 
-![网络协议 · 图 23](../../../assets/images/Cisco_packet_trace/image-28.png)
+![image-28](../../../assets/images/Cisco_packet_trace/image-28.png)
 
 #### tcp/ip协议组
 
-![tcp/ip协议组 · 图 24](../../../assets/images/Cisco_packet_trace/image-29.png)
+![image-29](../../../assets/images/Cisco_packet_trace/image-29.png)
 
-![tcp/ip协议组 · 图 25](../../../assets/images/Cisco_packet_trace/image-30.png)
+![image-30](../../../assets/images/Cisco_packet_trace/image-30.png)
 
-![tcp/ip协议组 · 图 26](../../../assets/images/Cisco_packet_trace/image-31.png)
+![image-31](../../../assets/images/Cisco_packet_trace/image-31.png)
 
-![tcp/ip协议组 · 图 27](../../../assets/images/Cisco_packet_trace/image-32.png)
+![image-32](../../../assets/images/Cisco_packet_trace/image-32.png)
 
-![tcp/ip协议组 · 图 28](../../../assets/images/Cisco_packet_trace/image-33.png)
+![image-33](../../../assets/images/Cisco_packet_trace/image-33.png)
 
-### 3.6数据分装
+### 3.6数据封装
 
 - 分段
 - 排序：标号多个片段以便定向和重组，标识用于片段在到达是对其排序和组装
 - PDU
 
-![3.6数据分装 · 图 29](../../../assets/images/Cisco_packet_trace/image-34.png)
+![image-34](../../../assets/images/Cisco_packet_trace/image-34.png)
 
 ### 地址
 
 网络层地址：负责将IP数据包从源设备传输到同一段网络或者其他网络中的目的主机
 
-物理层地址：将数据链路帧从一个网卡传输到相同网络的另一个网络上
+**数据链路层地址（MAC）**：在同一网段内，把数据链路帧从一块网卡送到另一块网卡
 
-![地址 · 图 30](../../../assets/images/Cisco_packet_trace/image-35.png)
+![image-35](../../../assets/images/Cisco_packet_trace/image-35.png)
 
 #### 网络层
 
-![网络层 · 图 31](../../../assets/images/Cisco_packet_trace/image-36.png)
+![image-36](../../../assets/images/Cisco_packet_trace/image-36.png)
 
 #### 数据链路层：不同IP网络
 
-![数据链路层：不同IP网络 · 图 32](../../../assets/images/Cisco_packet_trace/image-37.png)
+![image-37](../../../assets/images/Cisco_packet_trace/image-37.png)
 
 必须配置默认网关IP，所有向远程网络中的数据包都会走默认网关
 
-![数据链路层：不同IP网络 · 图 33](../../../assets/images/Cisco_packet_trace/image-38.png)
+![image-38](../../../assets/images/Cisco_packet_trace/image-38.png)
 
 帧的MAC地址在每段链路上传输的会更改
 
-![数据链路层：不同IP网络 · 图 34](../../../assets/images/Cisco_packet_trace/image-39.png)
+![image-39](../../../assets/images/Cisco_packet_trace/image-39.png)
 
 ## 物理层
 
-![物理层 · 图 35](../../../assets/images/Cisco_packet_trace/image-40.png)
+![image-40](../../../assets/images/Cisco_packet_trace/image-40.png)
 
 ### 编码
 
-![编码 · 图 36](../../../assets/images/Cisco_packet_trace/image-41.png)
+![image-41](../../../assets/images/Cisco_packet_trace/image-41.png)
 
 ### 信号
 
-![信号 · 图 37](../../../assets/images/Cisco_packet_trace/image-42.png)
+![image-42](../../../assets/images/Cisco_packet_trace/image-42.png)
 
-![信号 · 图 38](../../../assets/images/Cisco_packet_trace/image-43.png)
+![image-43](../../../assets/images/Cisco_packet_trace/image-43.png)
 
-![信号 · 图 39](../../../assets/images/Cisco_packet_trace/image-44.png)
+![image-44](../../../assets/images/Cisco_packet_trace/image-44.png)
 
 ### 带宽
 
-![带宽 · 图 40](../../../assets/images/Cisco_packet_trace/image-45.png)
+![image-45](../../../assets/images/Cisco_packet_trace/image-45.png)
 
-![带宽 · 图 41](../../../assets/images/Cisco_packet_trace/image-46.png)
+![image-46](../../../assets/images/Cisco_packet_trace/image-46.png)
 
 ### UTP布线
 
@@ -344,98 +345,97 @@ UTP 电缆仅通过线对扭绞的抵消效果来减小信号衰减，并为网�
 
 #### 接口和接头
 
-![接口和接头 · 图 42](../../../assets/images/Cisco_packet_trace/image-47.png)
+![image-47](../../../assets/images/Cisco_packet_trace/image-47.png)
 
 #### 直通和交叉
 
-![直通和交叉 · 图 43](../../../assets/images/Cisco_packet_trace/image-48.png)
+![image-48](../../../assets/images/Cisco_packet_trace/image-48.png)
 
 ### 光纤
 
-![光纤 · 图 44](../../../assets/images/Cisco_packet_trace/image-49.png)
+![image-49](../../../assets/images/Cisco_packet_trace/image-49.png)
 
-![光纤 · 图 45](../../../assets/images/Cisco_packet_trace/image-50.png)
+![image-50](../../../assets/images/Cisco_packet_trace/image-50.png)
 
 ### wireless lan
 
 WIFI(IEEE 802.11):wireless LAN(WIFI)(CSMA/CA)
 
-BLueTooth:personal area network,(1 - 100m)
+Bluetooth:personal area network,(1 - 100m)
 
-> WIMAX：Worldwide interopreability for Microware Access(IPHONE -- Microware)
+> WIMAX：Worldwide Interoperability for Microwave Access(IPHONE -- Microwave)
 
-ZigBee:IOT（物联网）low-power -cause, low-data communciations
+ZigBee:IOT（物联网）low-power -cause, low-data communications
 
 ## Number Systems
 
 ### Binary and IPV4
 
-IPV4 use 32 bits, divied into four sections
+IPv4 uses 32 bits, divided into four 8-bit sections (octets)
 
 ## 数据链路层
 
 ### Ethernet
 
-![Ethernet · 图 46](../../../assets/images/Cisco_packet_trace/image-51.png)
+![image-51](../../../assets/images/Cisco_packet_trace/image-51.png)
 
 encapsulate -> 封装
 topology -> 拓扑
 
 #### logic topology and physical topology
 
-![logic topology and physical topolo · 图 47](../../../assets/images/Cisco_packet_trace/image-52.png)
+![image-52](../../../assets/images/Cisco_packet_trace/image-52.png)
 
 #### PPP
 
-![PPP · 图 48](../../../assets/images/Cisco_packet_trace/image-53.png)
+![image-53](../../../assets/images/Cisco_packet_trace/image-53.png)
 
-w
 ### CSMA/CD
 
 wireless lan use CSMA/CA
 
-bus-topology and hub-use Enthernet LAN use CSMA/CD
+bus-topology and hub-use Ethernet LAN use CSMA/CD
 
 The link is free and PC1 has to send frame
 
-![CSMA/CD · 图 49](../../../assets/images/Cisco_packet_trace/image-54.png)
+![image-54](../../../assets/images/Cisco_packet_trace/image-54.png)
 
-The hub receives frame and transport to every port while PC2 need `t`o send frame, pc2 have to wait as it receive a frame
+The hub receives frame and transport to every port while PC2 needs to send frame, pc2 have to wait as it receive a frame
 
-![CSMA/CD · 图 50](../../../assets/images/Cisco_packet_trace/image-55.png)
+![image-55](../../../assets/images/Cisco_packet_trace/image-55.png)
 
 ### CSMA/CA
 
-![CSMA/CA · 图 51](../../../assets/images/Cisco_packet_trace/image-56.png)
+![image-56](../../../assets/images/Cisco_packet_trace/image-56.png)
 
-![CSMA/CA · 图 52](../../../assets/images/Cisco_packet_trace/image-57.png)
+![image-57](../../../assets/images/Cisco_packet_trace/image-57.png)
 
 ## Ethernet Encapsulation
 
-![Ethernet Encapsulation · 图 53](../../../assets/images/Cisco_packet_trace/image-58.png)
+![image-58](../../../assets/images/Cisco_packet_trace/image-58.png)
 
-![Ethernet Encapsulation · 图 54](../../../assets/images/Cisco_packet_trace/image-59.png)
+![image-59](../../../assets/images/Cisco_packet_trace/image-59.png)
 
 ### LLC
 
-![LLC · 图 55](../../../assets/images/Cisco_packet_trace/image-70.png)
+![image-70](../../../assets/images/Cisco_packet_trace/image-70.png)
 
 ### MAC
 
-![alt text](../../../assets/images/Cisco_packet_trace/image-62.png)
+![image-62](../../../assets/images/Cisco_packet_trace/image-62.png)
 
 #### MAC ADDRESS
 
 - 48bits，3bytes is OUI
 - USE on the local network segment
 
-Provieds a method for device identification at the link layer
+Provides a method for device identification at the link layer
 
 ### FRAME
 
-![FRAME · 图 56](../../../assets/images/Cisco_packet_trace/image-60.png)
+![image-60](../../../assets/images/Cisco_packet_trace/image-60.png)
 
-![FRAME · 图 57](../../../assets/images/Cisco_packet_trace/image-61.png)
+![image-61](../../../assets/images/Cisco_packet_trace/image-61.png)
 
 同步和帧开始：Preamble and Start Frame
 
@@ -445,29 +445,29 @@ MAC address is encoded into the ROM chip Permanently
 
 #### unicast MAC Address
 
-![unicast MAC Address · 图 58](../../../assets/images/Cisco_packet_trace/image-63.png)
+![image-63](../../../assets/images/Cisco_packet_trace/image-63.png)
 
 #### Broadcast MAC Address
 
 destination MAC address is FF-FF-FF-FF-FF-FF
 
-![Broadcast MAC Address · 图 59](../../../assets/images/Cisco_packet_trace/image-64.png)
+![image-64](../../../assets/images/Cisco_packet_trace/image-64.png)
 
 #### 组播地址
 
-![组播地址 · 图 60](../../../assets/images/Cisco_packet_trace/image-65.png)
+![image-65](../../../assets/images/Cisco_packet_trace/image-65.png)
 
 ### Switch Fundamental
 
-MAC address table： cotent addressable memory
+MAC address table： content addressable memory
 
 内容可寻址内存 (CAM) 表
 
 #### MAC address learn by itself
 
-![MAC address learn by itself · 图 61](../../../assets/images/Cisco_packet_trace/image-66.png)
+![image-66](../../../assets/images/Cisco_packet_trace/image-66.png)
 
-#### Dafault Gateway
+#### Default Gateway
 
 一个设备想要与其他网络上得设备通信，在发送帧时会把目的MAC地址设为该网络上连接互联网的路由器地址
 
@@ -478,16 +478,23 @@ MAC address table： cotent addressable memory
 - store frames and check FCS/CRC
 - need
 
-![store and forward switching · 图 62](../../../assets/images/Cisco_packet_trace/image-67.png)
+![image-67](../../../assets/images/Cisco_packet_trace/image-67.png)
 
 #### cut-through switching
 
 receive until the end of the dst MAC address then forward
 
-![cut-through switching · 图 63](../../../assets/images/Cisco_packet_trace/image-68.png)
+![image-68](../../../assets/images/Cisco_packet_trace/image-68.png)
 
 #### MEMORY BUFFERING methods
 
-![MEMORY BUFFERING methods · 图 64](../../../assets/images/Cisco_packet_trace/image-69.png)
+![image-69](../../../assets/images/Cisco_packet_trace/image-69.png)
 
-<!-- migrated-from: D:/Blog/docs/03-Linux与网络安全/网络工程/Cisco-Packet-Tracer-实验笔记.md -->
+
+## 相关笔记
+
+- 计算机网络知识地图
+- [Cisco 设备访问控制与密码验证](Cisco-设备访问控制与密码验证.md)
+- 总知识地图
+
+<!-- vault-sync: 由 D:/library/nico 自动同步，请勿在博客侧手工编辑 -->

@@ -1,3 +1,4 @@
+<!-- synced-from-vault: 04-Linux与网络安全/Cisco设备访问控制与密码验证.md | updated: 2026-11-06 -->
 # Cisco-设备访问控制与密码验证
 
 <!-- guide-start -->
@@ -11,21 +12,21 @@
 
 <!-- guide-end -->
 
-![Cisco-设备访问控制与密码验证 · 图 1](../../../assets/images/思科网院/第一次作业/image.png)
+![image](../../../assets/images/思科网院/第一次作业/image.png)
 
-![Cisco-设备访问控制与密码验证 · 图 2](../../../assets/images/思科网院/第一次作业/image-1.png)
+![image-1](../../../assets/images/思科网院/第一次作业/image-1.png)
 
 选D
 
-![Cisco-设备访问控制与密码验证 · 图 3](../../../assets/images/思科网院/第一次作业/image-2.png)
+![image-2](../../../assets/images/思科网院/第一次作业/image-2.png)
 
-![Cisco-设备访问控制与密码验证 · 图 4](../../../assets/images/思科网院/第一次作业/image-4.png)
+![image-4](../../../assets/images/思科网院/第一次作业/image-4.png)
 
-![Cisco-设备访问控制与密码验证 · 图 5](../../../assets/images/思科网院/第一次作业/image-6.png)
+![image-6](../../../assets/images/思科网院/第一次作业/image-6.png)
 
-![Cisco-设备访问控制与密码验证 · 图 6](../../../assets/images/思科网院/第一次作业/image-5.png)
+![image-5](../../../assets/images/思科网院/第一次作业/image-5.png)
 
-![Cisco-设备访问控制与密码验证 · 图 7](../../../assets/images/思科网院/第一次作业/image-7.png)
+![image-7](../../../assets/images/思科网院/第一次作业/image-7.png)
 
 ## Cisco 设备访问控制与密码验证逻辑
 
@@ -51,8 +52,7 @@
 *   题目问“进入用户模式”，找 Console 或 VTY 的密码。
 *   题目问“进入特权模式”，找 `enable secret` 的密码。
 *   千万不要搞混“Console 口密码”和“VTY 密码”。
-*
-![⚠️ 易错点提示 · 图 8](../../../assets/images/思科网院/第一次作业/image-8.png)
+![image-8](../../../assets/images/思科网院/第一次作业/image-8.png)
 
 ## SSH 与 Telnet 的区别（必考）
 
@@ -82,7 +82,7 @@
 Switch(config)# hostname SW1
 SW1(config)# ip domain-name example.com
 ! 生成 RSA 密钥对（SSH 必须）
-SW1(config)# crypto key generate rsa modulus 1024
+SW1(config)# crypto key generate rsa modulus 1024   ! 课堂示例；生产环境建议 2048 位以上
 ! 配置用户名密码（SSH 建议用本地认证）
 SW1(config)# username admin secret cisco123
 ! 限制 VTY 线路只允许 SSH
@@ -92,7 +92,7 @@ SW1(config-line)# login local
 SW1(config-line)# exit
 ```
 
-![配置示例：在 Cisco 设备上启用 SSH（替代 Telnet） · 图 9](../../../assets/images/思科网院/第一次作业/image-10.png)
+![image-10](../../../assets/images/思科网院/第一次作业/image-10.png)
 
 ## 网络协议 (Network Protocols) 的核心概念
 
@@ -116,13 +116,24 @@ SW1(config-line)# exit
 | :--- | :--- |
 | **应用层** | HTTP, FTP, DNS, SMTP |
 | **传输层** | TCP, UDP |
-| **网际层** | IP, ICMP, OSPF |
-| **网络接入层** | Ethernet, ARP, PPP |
+| **网际层** | IP, ICMP |
+| **网络接入层** | Ethernet, PPP |
+
+> **提示** · 分层归属 · 待复核（2026-11-06）
+> 原表把 ARP 放在网络接入层、OSPF 放在网际层。ARP 在不同教材中归网络层或链路层；OSPF 直接封装在 IP 之上（协议号 89），有的体系把它归应用层。两种说法并存，已把有争议项移出表格，请以课程教材为准。
 
 ### 核心结论
 
 网络协议定义了**源和目标之间如何交换消息**。无论是局域网内还是跨互联网，只要设备需要通信，就需要协议。
 
-![核心结论 · 图 10](../../../assets/images/思科网院/第一次作业/image-11.png)
+![image-11](../../../assets/images/思科网院/第一次作业/image-11.png)
 
-<!-- migrated-from: D:/Blog/docs/03-Linux与网络安全/网络工程/Cisco-设备访问控制与密码验证.md -->
+
+## 相关笔记
+
+- 计算机网络知识地图
+- [Cisco Packet Tracer 实验笔记](Cisco-Packet-Tracer-实验笔记.md)
+- [思科网院 · 网络概念](../../01-计算机基础/计算机网络/思科网院-网络概念.md)
+- 总知识地图
+
+<!-- vault-sync: 由 D:/library/nico 自动同步，请勿在博客侧手工编辑 -->

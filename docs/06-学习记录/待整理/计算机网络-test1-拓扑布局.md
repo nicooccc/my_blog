@@ -1,3 +1,4 @@
+<!-- synced-from-vault: 01-Inbox/To Process/网络拓扑布局小测.md | updated: 2026-11-06 -->
 # 拓扑布局
 
 <!-- guide-start -->
@@ -11,11 +12,17 @@
 
 <!-- guide-end -->
 
-![拓扑布局 · 图 1](../../../assets/images/计算机网络/test1/f0c5bce1ffc6c0fa27ffc00eb18dc8a9.jpg)
+![f0c5bce1ffc6c0fa27ffc00eb18dc8a9](../../../assets/images/计算机网络/test1/f0c5bce1ffc6c0fa27ffc00eb18dc8a9.jpg)
 
 
-![拓扑布局 · 图 2](../../../assets/images/计算机网络/test1/image.png)
+![image](../../../assets/images/计算机网络/test1/image.png)
 
-![拓扑布局 · 图 3](../../../assets/images/计算机网络/test1/image-1.png)
+![image-1](../../../assets/images/计算机网络/test1/image-1.png)
 
-<!-- migrated-from: D:/Blog/docs/06-学习记录/待整理/计算机网络-test1-拓扑布局.md -->
+
+## 相关笔记
+
+- Inbox Dashboard
+- 计算机网络知识地图
+
+<!-- vault-sync: 由 D:/library/nico 自动同步，请勿在博客侧手工编辑 -->
