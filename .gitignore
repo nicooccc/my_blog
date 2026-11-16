@@ -55,3 +55,6 @@ yarn-error.log*
 *.class
 *.pyc
 __pycache__/
+
+# --- Office 打开文件时生成的锁文件（~$xxx.pptx 等） ---
+~$*
