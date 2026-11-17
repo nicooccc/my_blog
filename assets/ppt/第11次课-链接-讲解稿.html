@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第11次课 · 程序的链接 —— 逐页讲解稿</title>
+<style>
+  :root{
+    --bg:#f6f7f9;
+    --panel:#ffffff;
+    --ink:#1f2430;
+    --ink-soft:#4b5463;
+    --line:#e4e8ee;
+    --brand:#2f5fe0;
+    --brand-soft:#eaf0ff;
+    --c1:#2f6fed;      /* 第一讲 */
+    --c2:#8b5cf6;      /* 第二讲 */
+    --c3:#0e9f8a;      /* 第三讲 */
+    --warn:#c2410c;
+    --warn-bg:#fff4ea;
+    --code-bg:#1e2430;
+    --code-ink:#e6edf7;
+    --ok:#15803d;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:"PingFang SC","Microsoft YaHei","Segoe UI",system-ui,sans-serif;
+    line-height:1.85;font-size:16px;
+  }
+  /* 顶部朗读控制条 */
+  .player{
+    position:sticky;top:0;z-index:50;
+    background:rgba(255,255,255,.94);backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+    padding:10px 20px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+  }
+  .player .title{font-weight:700;margin-right:6px;font-size:15px}
+  .player button{
+    border:1px solid var(--line);background:#fff;color:var(--ink);
+    padding:7px 13px;border-radius:9px;cursor:pointer;font-size:14px;
+    transition:.15s;font-family:inherit;
+  }
+  .player button:hover{border-color:var(--brand);color:var(--brand)}
+  .player button.primary{background:var(--brand);color:#fff;border-color:var(--brand)}
+  .player button.primary:hover{background:#234fc4;color:#fff}
+  .player label{font-size:13px;color:var(--ink-soft);display:flex;align-items:center;gap:6px}
+  .player select{border:1px solid var(--line);border-radius:8px;padding:5px 8px;font-family:inherit;font-size:13px}
+  .player .status{font-size:13px;color:var(--ink-soft);margin-left:auto}
+  .progress{position:sticky;top:0;height:3px;background:transparent;z-index:51}
+  .progress > div{height:100%;width:0;background:var(--brand);transition:width .1s}
+
+  .wrap{max-width:1080px;margin:0 auto;padding:26px 20px 100px}
+
+  /* 封面 */
+  .cover{
+    background:linear-gradient(135deg,#2f6fed 0%,#5442d6 55%,#0e9f8a 120%);
+    color:#fff;border-radius:20px;padding:40px 42px;margin-bottom:28px;
+    box-shadow:0 12px 34px rgba(47,95,224,.22);
+  }
+  .cover .kicker{font-size:14px;letter-spacing:2px;opacity:.85}
+  .cover h1{margin:10px 0 8px;font-size:32px;line-height:1.35}
+  .cover p{margin:6px 0 0;opacity:.92;font-size:15px}
+  .cover .chips{margin-top:20px;display:flex;gap:10px;flex-wrap:wrap}
+  .cover .chip{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);padding:6px 13px;border-radius:99px;font-size:13px}
+
+  .notice{
+    background:var(--brand-soft);border:1px solid #d3e0ff;color:#1e3a8a;
+    border-radius:14px;padding:16px 20px;margin-bottom:30px;font-size:14.5px;
+  }
+  .notice b{color:#16307a}
+
+  /* 目录 */
+  .toc{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px 26px;margin-bottom:34px}
+  .toc h2{margin:0 0 14px;font-size:19px}
+  .toc .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .toc h3{font-size:15px;margin:0 0 8px;padding-bottom:6px;border-bottom:2px solid}
+  .toc .g1 h3{color:var(--c1);border-color:var(--c1)}
+  .toc .g2 h3{color:var(--c2);border-color:var(--c2)}
+  .toc .g3 h3{color:var(--c3);border-color:var(--c3)}
+  .toc a{display:block;color:var(--ink-soft);text-decoration:none;font-size:13.5px;padding:3px 0;border-radius:6px}
+  .toc a:hover{color:var(--brand);padding-left:5px}
+
+  /* 讲 - 大分区 */
+  .lecture{margin:42px 0 10px}
+  .lecture-head{
+    display:flex;align-items:center;gap:14px;border-radius:14px;
+    padding:18px 22px;color:#fff;
+  }
+  .lecture-head .num{font-size:13px;font-weight:700;opacity:.85;letter-spacing:1px}
+  .lecture-head h2{margin:0;font-size:23px}
+  .lecture-head .pg{margin-left:auto;font-size:13px;opacity:.9}
+  .l1 .lecture-head{background:linear-gradient(100deg,var(--c1),#4f8bff)}
+  .l2 .lecture-head{background:linear-gradient(100deg,var(--c2),#a78bfa)}
+  .l3 .lecture-head{background:linear-gradient(100deg,var(--c3),#34d3b5)}
+
+  /* 知识点卡片 */
+  .block{
+    background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    padding:20px 24px;margin:16px 0;position:relative;
+  }
+  .block h3{
+    margin:0 0 12px;font-size:18px;display:flex;align-items:center;gap:10px;
+    padding-right:44px;
+  }
+  .l1 .block h3::before{content:"";width:5px;height:20px;border-radius:3px;background:var(--c1);position:absolute;left:0}
+  .l2 .block h3::before{content:"";width:5px;height:20px;border-radius:3px;background:var(--c2);position:absolute;left:0}
+  .l3 .block h3::before{content:"";width:5px;height:20px;border-radius:3px;background:var(--c3);position:absolute;left:0}
+  .pgtag{font-size:12px;font-weight:600;color:#fff;background:#94a3b8;padding:2px 9px;border-radius:99px;white-space:nowrap}
+  .l1 .pgtag{background:var(--c1)} .l2 .pgtag{background:var(--c2)} .l3 .pgtag{background:var(--c3)}
+  .speak{
+    position:absolute;top:18px;right:18px;width:34px;height:34px;border-radius:50%;
+    border:1px solid var(--line);background:#fff;cursor:pointer;font-size:15px;
+    display:flex;align-items:center;justify-content:center;transition:.15s;
+  }
+  .speak:hover{border-color:var(--brand);background:var(--brand-soft)}
+  .speak.playing{background:var(--brand);color:#fff;border-color:var(--brand)}
+
+  .block p{margin:9px 0;color:var(--ink-soft)}
+  .block p b,.block li b{color:var(--ink)}
+  .block ul,.block ol{margin:9px 0;padding-left:24px;color:var(--ink-soft)}
+  .block li{margin:5px 0}
+  em.hl{font-style:normal;background:#fff2b8;padding:0 3px;border-radius:4px;color:#7a5b00}
+  em.key{font-style:normal;color:var(--brand);font-weight:600}
+
+  .quote{
+    border-left:4px solid var(--brand);background:#f7f9ff;
+    padding:10px 16px;border-radius:0 10px 10px 0;margin:12px 0;color:#28324a;font-size:14.5px;
+  }
+  .tip{
+    background:#eefaf4;border:1px solid #cdeedc;border-radius:10px;
+    padding:12px 16px;margin:12px 0;font-size:14.5px;color:#14532d;
+  }
+  .tip b{color:#0b3d22}
+  .warn{
+    background:var(--warn-bg);border:1px solid #ffd8bd;border-radius:10px;
+    padding:12px 16px;margin:12px 0;font-size:14.5px;color:var(--warn);
+  }
+  .warn b{color:#9a3412}
+
+  pre{
+    background:var(--code-bg);color:var(--code-ink);border-radius:10px;
+    padding:14px 16px;overflow:auto;font-size:13px;line-height:1.65;margin:12px 0;
+    font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+  }
+  pre .c{color:#7d8ba1}      /* 注释 */
+  pre .k{color:#ff9d7a}      /* 关键字 */
+  pre .s{color:#a5e6a0}      /* 字符串 */
+  code.inline{background:#eef1f6;color:#b8290b;padding:1px 6px;border-radius:5px;font-size:13px;font-family:Consolas,monospace}
+
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13.5px}
+  th,td{border:1px solid var(--line);padding:8px 11px;text-align:left;vertical-align:top}
+  th{background:#f3f5f9;color:var(--ink);font-weight:600}
+  td{color:var(--ink-soft)}
+
+  /* 随堂题 */
+  .quiz{
+    background:#fffaf3;border:1px solid #fde3bf;border-radius:14px;
+    padding:18px 22px;margin:18px 0;
+  }
+  .quiz .qhead{font-weight:700;color:#9a3412;margin-bottom:8px;font-size:15px}
+  .quiz .opt{margin:4px 0;color:var(--ink-soft);font-size:14px}
+  .quiz .ans{
+    margin-top:12px;background:#fff;border:1px dashed #f0b27a;border-radius:10px;
+    padding:11px 14px;font-size:14px;
+  }
+  .quiz .ans b{color:var(--ok)}
+
+  /* 公式 */
+  .formula{
+    background:#f3f0ff;border:1px solid #e0d7ff;border-radius:10px;
+    padding:12px 16px;margin:12px 0;font-family:Consolas,monospace;font-size:14px;color:#4c1d95;
+  }
+
+  .summary{
+    background:linear-gradient(135deg,#f8fafc,#eef2ff);border:1px solid var(--line);
+    border-radius:14px;padding:20px 24px;margin:20px 0;
+  }
+  .summary h3{margin:0 0 10px;color:var(--brand);font-size:17px}
+
+  .foot{text-align:center;color:#94a3b8;font-size:13px;margin-top:50px}
+
+  @media(max-width:760px){
+    .toc .grid{grid-template-columns:1fr}
+    .cover h1{font-size:25px}
+    .wrap{padding:16px 12px 80px}
+  }
+</style>
+</head>
+<body>
+
+<div class="progress"><div id="bar"></div></div>
+
+<div class="player">
+  <span class="title">🔊 语音讲解</span>
+  <button class="primary" id="playAll">▶ 从头朗读</button>
+  <button id="pauseBtn">⏸ 暂停</button>
+  <button id="resumeBtn">▶ 继续</button>
+  <button id="stopBtn">⏹ 停止</button>
+  <label>语速 <select id="rate">
+    <option value="0.85">慢</option>
+    <option value="1" selected>正常</option>
+    <option value="1.15">快</option>
+    <option value="1.3">很快</option>
+  </select></label>
+  <span class="status" id="status">点击标题右侧 🔈 可单独朗读该段</span>
+</div>
+
+<div class="wrap">
+
+  <div class="cover">
+    <div class="kicker">计算机系统基础 · 第4章 · 程序的链接</div>
+    <h1>第11次课 逐页讲解稿</h1>
+    <p>链接概述与目标文件格式 · 符号表与符号解析 · 重定位与动态链接</p>
+    <p>配套课件共 108 页 · 讲解覆盖全部知识点 · 支持语音朗读</p>
+    <div class="chips">
+      <span class="chip">📘 第一讲 目标文件格式（P1–38）</span>
+      <span class="chip">📗 第二讲 符号表与符号解析（P39–77）</span>
+      <span class="chip">📙 第三讲 重定位与动态链接（P78–108）</span>
+    </div>
+  </div>
+
+  <div class="notice">
+    <b>使用说明：</b>听不到课堂音频没关系。这份讲稿按课件顺序，把每一页老师在讲什么、为什么这么讲，用文字完整还原。
+    点击顶部 <b>「从头朗读」</b> 可让浏览器自动念给你听；也可以点每个知识点右上角的 <b>🔈</b> 单独听某一段。
+    代码块里是课件中的真实命令与机器代码，随堂题都附了答案与解析。
+  </div>
+
+  <div class="toc">
+    <h2>📚 目录</h2>
+    <div class="grid">
+      <div class="g1">
+        <h3>第一讲 · 目标文件格式</h3>
+        <a href="#l1-a">编译链接全过程</a>
+        <a href="#l1-b">链接器的由来与好处</a>
+        <a href="#l1-c">示例程序 main / swap</a>
+        <a href="#l1-d">链接的本质：合并节</a>
+        <a href="#l1-e">三类目标文件</a>
+        <a href="#l1-f">ELF 两种视图</a>
+        <a href="#l1-g">可重定位目标文件各节</a>
+        <a href="#l1-h">ELF 头与节头表</a>
+        <a href="#l1-i">可执行目标文件</a>
+        <a href="#l1-j">存储器映像与程序头表</a>
+        <a href="#l1-k">第一讲随堂题与总结</a>
+      </div>
+      <div class="g2">
+        <h3>第二讲 · 符号表与符号解析</h3>
+        <a href="#l2-a">三种链接器符号</a>
+        <a href="#l2-b">符号表结构</a>
+        <a href="#l2-c">强符号与弱符号</a>
+        <a href="#l2-d">符号解析三规则</a>
+        <a href="#l2-e">多重定义举例</a>
+        <a href="#l2-f">静态共享库</a>
+        <a href="#l2-g">符号解析全过程 E/U/D</a>
+        <a href="#l2-h">链接顺序问题</a>
+        <a href="#l2-i">第二讲随堂题与总结</a>
+      </div>
+      <div class="g3">
+        <h3>第三讲 · 重定位与动态链接</h3>
+        <a href="#l3-a">重定位三步</a>
+        <a href="#l3-b">重定位信息与类型</a>
+        <a href="#l3-c">R_386_PC32 计算</a>
+        <a href="#l3-d">R_386_32 计算</a>
+        <a href="#l3-e">swap.o 六处重定位</a>
+        <a href="#l3-f">重定位后完整代码</a>
+        <a href="#l3-g">动态链接与共享库</a>
+        <a href="#l3-h">位置无关代码 PIC</a>
+        <a href="#l3-i">第三讲随堂题与总结</a>
+      </div>
+    </div>
+  </div>
+
+<!-- ======================= 第一讲 ======================= -->
+<div class="lecture l1" id="L1">
+  <div class="lecture-head">
+    <div><div class="num">LECTURE ONE</div><h2>第一讲 · 目标文件格式</h2></div>
+    <div class="pg">课件第 1–38 页</div>
+  </div>
+</div>
+
+<div class="block" id="l1-a">
+  <button class="speak" title="朗读本段">🔈</button>
+  <h3><span class="pgtag">P2–3</span> 这一讲要学什么</h3>
+  <p>这一讲是整个"程序的链接"的开场。教学目标写在第 2 页：搞清楚<b>链接器是怎么工作的</b>。听起来好像只是工具层面的事，但它其实有两层更深的意义——一是让你养成良好的程序设计习惯、增强调试能力，二是通过"可执行文件的存储器映像"这个概念，帮你真正理解<b>进程的虚拟地址空间</b>。</p>
+  <p>三部分内容依次是：链接和静态链接的概念、三种目标文件格式、符号与符号表、静态库、重定位、可执行文件映像与加载，最后再讲动态链接。这一讲先把<b>目标文件格式</b>这个"舞台"搭好，后面两讲的符号解析、重定位都在这个舞台上进行。</p>
+  <div class="quote">一句话抓住主线：程序要跑起来，得先经历 <em class="hl">源程序 → 可执行目标文件</em> 的转换；链接就是这条链路的最后一环，而目标文件格式就是这一环里数据长什么样。</div>
+</div>
+
+<div class="block">
+  <button class="speak" title="朗读本段">🔈</button>
+  <h3><span class="pgtag">P4</span> 一个典型程序的转换过程</h3>
+  <p>第 4 页用经典的 <code class="inline">hello.c</code> 展示了完整链路。计算机<b>不能直接执行</b> hello.c，因为它是给人看的 ASCII 文本。中间要经过四个步骤：</p>
+  <pre><span class="k">hello.c</span>  --cpp(预处理)-->  <span class="k">hello.i</span>  --cc1(编译)-->  <span class="k">hello.s</span>  --as(汇编)-->  <span class="k">hello.o</span>  --ld(链接)-->  <span class="k">hello</span>
+ 源程序(文本)                 预处理后的C          汇编语言程序(文本)       可重定位目标(二进制)      可执行目标(二进制)</pre>
+  <ul>
+    <li><b>预处理 cpp</b>：展开 <code class="inline">#include</code>、<code class="inline">#define</code> 等，得到 hello.i；</li>
+    <li><b>编译 cc1</b>：翻译成汇编语言 hello.s（还是文本）；</li>
+    <li><b>汇编 as</b>：汇编成机器指令，得到 hello.o（二进制）；</li>
+    <li><b>链接 ld</b>：把 hello.o 和系统库里的 printf.o 等拼起来，得到可执行的 hello。</li>
+  </ul>
+  <p>课件还特意放大了 hello.c 的 ASCII 编码——每个字符对应一个字节（如 <code class="inline">#</code>=35, <code class="inline">i</code>=105），就是为了让你直观感受到"文本"和"二进制"的差别。</p>
+</div>
+
+<div class="block" id="l1-b">
+  <button class="speak" title="朗读本段">🔈</button>
+  <h3><span class="pgtag">P5–6</span> 链接器是怎么来的</h3>
+  <p>第 5、6 页讲了段很有意思的历史。最早程序员用<b>机器语言</b>在纸带、卡片上打孔，<em class="hl">穿孔表示 0、未穿孔表示 1</em>。跳转指令的目标地址只能写成绝对地址（比如"0010-jmp"跳到第 5 条）。问题来了：如果中间插入一条指令，后面所有跳转地址都要手工重算，然后重新打孔——这就是"重定位"最原始、最痛的由来。</p>
+  <p>于是人们想到：<b>用符号代替 0/1</b>。汇编语言用助记符表示操作码、用符号表示位置（L0、B、C）。这样只要写 <code class="inline">jmp L0</code>，先确定 L0 的地址，再把这个地址填进 jmp 指令就行了。高级语言出现后，程序越来越复杂、需要多人分模块开发：</p>
+  <ul>
+    <li>函数/子程序的起始地址、变量的起始地址 = <em class="key">符号定义 definition</em>；</li>
+    <li>调用函数、使用变量 = <em class="key">符号引用 reference</em>；</li>
+    <li>一个模块定义的符号可以被另一个模块引用，最终必须"链接（合并）"，合并时在引用处填入定义处的地址。</li>
+  </ul>
+  <div class="tip">⭐ 核心洞察：链接器本质上干的就是两件事——<b>找到符号定义在哪</b>（符号解析），<b>把地址填到引用处</b>（重定位）。整个第 4 章都在展开这两句话。</div>
+</div>
+
+<div class="block">
+  <button class="speak" title="朗读本段">🔈</button>
+  <h3><span class="pgtag">P7</span> 使用链接的好处</h3>
+  <p>第 7 页总结两大好处：</p>
+  <ul>
+    <li><b>好处1：模块化</b>。一个程序可以拆成很多源程序文件；还可以构建公共函数库（数学库、标准 I/O 库等）供所有人用。</li>
+    <li><b>好处2：效率高</b>。<b>时间上</b>——可以分开编译，改了哪个文件就只重新编译那个文件，然后重新链接即可；<b>空间上</b>——源文件里不用包含共享库的源码，只要直接调用，可执行文件和内存里只包含"实际调用到的"那部分库函数代码，而不是整个库。</li>
+  </ul>
+</div>
+
+<div class="quiz" data-text="随堂题 P8：有关链接好处和不足的叙述，错误的是？答案 D——因为链接只会把用到的库代码纳入可执行文件，不会让所占空间变大。">
+  <div class="qhead">随堂题 · P8（错误的是）</div>
+  <div class="opt">A. 使程序员可以分模块开发，提高大规模程序开发效率</div>
+  <div class="opt">B. 使公共函数库可为所有程序共享使用，利于代码重用</div>
+  <div class="opt">C. 使程序员仅需重新编译修改过的模块，节省开发时间</div>
+  <div class="opt">D. 使生成的可执行代码包含更多公共库函数代码，所占空间大</div>
+  <div class="ans"><b>答案 D。</b> 链接恰恰相反——只把用到的函数代码拷进来，目的就是节省空间；"包含更多库代码、空间大"与链接的初衷相悖。A/B/C 都是链接公认的好处。</div>
+</div>
+
+<div class="block" id="l1-c">
+  <button class="speak" title="朗读本段">🔈</button>
+  <h3><span class="pgtag">P9–10</span> 贯穿全课的示例程序</h3>
+  <p>从第 9 页开始，课件引入了一个会贯穿后面所有讲解的例子——<code class="inline">main.c</code> 和 <code class="inline">swap.c</code>。务必记住它，后面符号表、重定位都围着它转。</p>
+  <pre><span class="c">/* main.c */</span>
+<span class="k">int</span> buf[2] = {1, 2};          <span class="c">// 定义全局数组 buf</span>
+<span class="k">void</span> swap();                  <span class="c">// 声明（引用）外部函数 swap</span>
+<span class="k">int</span> main() { swap(); <span class="k">return</span> 0; }
+
+<span class="c">/* swap.c */</span>
+<span class="k">extern int</span> buf[];              <span class="c">// 引用别处定义的 buf</span>
+<span class="k">int</span> *bufp0 = &amp;buf[0];           <span class="c">// 定义并初始化全局指针 bufp0</span>
+<span class="k">static int</span> *bufp1;             <span class="c">// 定义静态（本地）指针 bufp1</span>
+<span class="k">void</span> swap() {
+    <span class="k">int</span> temp;                     <span class="c">// 局部变量，分配在栈上，不是符号</span>
+    bufp1 = &amp;buf[1];
+    temp = *bufp0;  *bufp0 = *bufp1;  *bufp1 = temp;
+}</pre>
+  <p>课件问："哪些是符号定义？哪些是引用？"注意最后那句提示——<b>局部变量 temp 分配在栈上，不会在过程外被引用，因此不是符号</b>。这一点在第二讲会反复强调。</p>
+  <p>第 10 页给出编译命令：<code class="inline">gcc -O2 -g -o p main.c swap.c</code>。<code class="inline">-O2</code> 是 2 级优化，<code class="inline">-g</code> 生成调试信息（后面会看到它多产出 .debug 和 .line 节），<code class="inline">-o p</code> 指定输出文件名。静态链接过程是：两个 .c 分别经过 cpp/cc1/as 变成 main.o 和 swap.o，再由 ld 链接成可执行文件 p。</p>
+</div>
+
+<div class="block" id="l1-d">
+  <button class="speak" title="朗读本段">🔈</button>
+  <h3><span class="pgtag">P11</span> 链接的本质：合并相同的"节"</h3>
+  <p>第 11 页是理解全局的关键图。链接器把<b>多个可重定位目标文件里相同的"节"(section) 合并到一起</b>，形成可执行文件：</p>
+  <ul>
+    <li>main.o 的 .text（main 的代码）+ swap.o 的 .text（swap 的代码）+ 系统代码 → 可执行文件的一个大 .text 节；</li>
+    <li>各自的 .data（buf、bufp0）合并成一个 .data 节；</li>
+    <li>各自的 .bss（bufp1）合并成一个 .bss 节；</li>
+    <li>ELF 头、系统数据、.symtab、.debug 等也一并整合。</li>
+  </ul>
+  <div class="quote">记住这句话：<em class="hl">链接 = 合并相同的节 + 给符号定地址 + 改写引用</em>。第 11 页讲"合并节"，第 14–15 页讲完整四步，第三讲再逐步算给你看。</div>
+</div>
+
+<div class="block">
+  <button class="speak" title="朗读本段">🔈</button>
+  <h3><span class="pgtag">P12</span> 从 objdump 看"重定位前 vs 后"</h3>
+  <p>第 12 页用 <code class="inline">objdump -d</code> 反汇编对比了同一个 add 函数在两种文件里的样子：</p>
+  <ul>
+    <li>在可重定位文件 test.o 里，add 的地址是 <b>0 开始</b>的相对偏移（<code class="inline">00000000 &lt;add&gt;:</code>，指令从 0、1、3…编号）；</li>
+    <li>在可执行文件 test 里，add 已经有了真实的<b>虚拟地址</b>（<code class="inline">080483d4 &lt;add&gt;:</code>）。</li>
+  </ul>
+  <p>两条指令的机器码字节完全一样，只是地址标签变了。这正好说明：<b>.o 文件里的代码和数据地址都从 0 开始，链接后被重新安置到虚拟地址空间的某个位置</b>——这就是"重定位"名字的由来。</p>
+</div>
+
+<div class="block">
+  <button class="speak" title="朗读本段">🔈</button>
+  <h3><span class="pgtag">P13</span> 可执行文件的存储器映像</h3>
+  <p>第 13 页第一次展示了一张后面会反复出现的图——32 位 Linux 进程的虚拟地址空间布局。从低地址到高地址依次是：</p>
+  <ul>
+    <li><b>0x08048000 起</b>：从可执行文件装入的只读代码段（.init/.text/.rodata）和读写数据段（.data/.bss）；</li>
+    <li><b>堆 heap</b>：由 malloc 动态生成，向上增长，顶端是 brk；</li>
+    <li><b>共享库区域</b>：动态链接的 .so 映射在这里；</li>
+    <li><b>用户栈 User stack</b>：动态生成，顶端是 %esp，向下增长；</li>
+    <li><b>0xC0000000 以上</b>：内核虚存区（1GB）。</li>
+  </ul>
+  <p>图的左侧还画了可执行文件本身的节，并注明"<b>程序(段)头表描述如何映射</b>"——也就是文件的节是怎么被搬到内存各段去的。这张图现在是"先混个脸熟"，第 33、36 页会详细讲。</p>
+</div>
+
+<div class="block">
+  <button class="speak" title="朗读本段">🔈</button>
+  <h3><span class="pgtag">P14–15</span> 链接操作的完整步骤</h3>
+  <p>这两页把链接拆成四小步（第 14 页），第 15 页又归并成两大步，务必记牢：</p>
+  <ol>
+    <li><b>确定标号引用关系（符号解析）</b>——把每个符号引用和某个确定的符号定义关联起来；</li>
+    <li><b>合并相关 .o 文件</b>——把多个代码段、数据段分别合并成一个；</li>
+    <li><b>确定每个标号的地址</b>——计算每个定义符号在虚拟地址空间中的绝对地址；</li>
+    <li><b>在指令中填入新地址</b>——把引用处的地址改成重定位后的地址。</li>
+  </ol>
+  <p>第 15 页把它归纳成两步：<b>Step 1 符号解析（Symbol resolution）</b> 和 <b>Step 2 重定位（Relocation）</b>。符号表是个结构数组，每个表项含符号名、长度、位置等；编译器把定义的符号存进符号表，链接器把每个引用和确定的定义建立关联。第二讲专讲 Step 1，第三讲专讲 Step 2。</p>
+</div>
+
+<div class="block" id="l1-e">
+  <button class="speak" title="朗读本段">🔈</button>
+  <h3><span class="pgtag">P16–17</span> 三类目标文件与常见格式</h3>
+  <p>第 16 页讲三种目标文件：</p>
+  <table>
+    <tr><th>类型</th><th>说明</th><th>扩展名</th></tr>
+    <tr><td>可重定位目标文件</td><td>代码数据可与其他 .o 合并；由对应 .c 生成；地址都从 0 开始</td><td>.o（Windows 是 .obj）</td></tr>
+    <tr><td>可执行目标文件</td><td>代码数据可被直接复制到内存执行；地址是虚拟地址</td><td>默认 a.out（Windows .exe）</td></tr>
+    <tr><td>共享目标文件</td><td>特殊的可重定位文件，装入或运行时被装入并自动链接</td><td>.so（Windows 叫 DLL）</td></tr>
+  </table>
+  <p>第 17 页回顾目标文件格式的历史：DOS 的 COM（最简单，只有代码数据、加载到固定位置）→ System V UNIX 的 COFF（含重定位、调试、符号表等信息）→ Windows 的 PE（COFF 变种）→ Linux 的 <b>ELF</b>（COFF 变种，Executable and Linkable Format）。本课程聚焦 ELF。</p>
+</div>
+
+<div class="block" id="l1-f">
+  <button class="speak" title="朗读本段">🔈</button>
+  <h3><span class="pgtag">P18</span> ELF 的两种视图（重点）</h3>
+  <p>第 18 页是 ELF 的核心概念——同一份 ELF 文件，站在不同角度有两种看法：</p>
+  <ul>
+    <li><b>链接视图（被链接时）</b>：对应可重定位目标文件，由不同的<b>节 section</b> 组成。节是 ELF 文件中具有相同特征的最小可处理单位，比如 .text 是代码、.data 是数据、.rodata 是只读数据、.bss 是未初始化数据。</li>
+    <li><b>执行视图（被执行时）</b>：对应可执行目标文件，由不同的<b>段 segment</b> 组成。段描述节如何映射到存储段，<em class="hl">多个节可以映射到同一个段</em>——例如 .data 和 .bss 合并映射到一个"可读可写数据段"。</li>
+  </ul>
+  <div class="tip">⭐ 这是选择题高频考点：<b>节（section）是链接的视角，段（segment）是执行的视角</b>。可重定位文件=链接视图=按节组织；可执行文件=执行视图=按段组织。</div>
+</div>
+
+<div class="block" id="l1-g">
+  <button class="speak" title="朗读本段">🔈</button>
+  <h3><span class="pgtag">P19–22</span> 可重定位目标文件：各节详解</h3>
+  <p>第 19 页先总述：可重定位文件能被链接生成可执行或共享文件，静态库就是由若干个 .o 组成的，它包含代码、数据（已初始化 .data 和未初始化 .bss），还包含<b>重定位信息</b>（指出哪些符号引用处需要重定位）。第 20–22 页逐节介绍，这是必须掌握的表格：</p>
+  <table>
+    <tr><th>节名</th><th>作用</th></tr>
+    <tr><td><b>ELF 头</b></td><td>魔数、版本、大小端、OS 平台、文件类型、机器类型、节头表起始位置和长度等</td></tr>
+    <tr><td><b>.text</b></td><td>编译后的机器代码</td></tr>
+    <tr><td><b>.rodata</b></td><td>只读数据，如 printf 格式串、switch 跳转表</td></tr>
+    <tr><td><b>.data</b></td><td>已初始化的全局变量</td></tr>
+    <tr><td><b>.bss</b></td><td>未初始化全局变量，仅是占位符，<b>不占实际磁盘空间</b>（区分初始化/未初始化是为了空间效率）</td></tr>
+    <tr><td><b>.symtab</b></td><td>符号表，函数名和全局静态变量名等信息</td></tr>
+    <tr><td><b>.rel.text</b></td><td>.text 相关的重定位信息：合并时哪些指令的操作数地址/跳转目标要改</td></tr>
+    <tr><td><b>.rel.data</b></td><td>.data 相关的重定位信息：合并时哪些全局变量地址要改</td></tr>
+    <tr><td><b>.debug</b></td><td>调试符号表，只有 gcc 带 <code class="inline">-g</code> 才有</td></tr>
+    <tr><td><b>.strtab</b></td><td>字符串表：.symtab 和 .debug 中的符号名、节名，以 null 结尾的字符串序列</td></tr>
+    <tr><td><b>.line</b></td><td>C 源程序行号与 .text 机器指令的映射，也要 <code class="inline">-g</code> 才有</td></tr>
+    <tr><td><b>节头表</b></td><td>若干表项，每项描述一个节的节名、偏移、大小、访问属性、对齐方式等</td></tr>
+  </table>
+</div>
+
+<div class="block">
+  <button class="speak" title="朗读本段">🔈</button>
+  <h3><span class="pgtag">P23–24</span> .rodata 的两个例子</h3>
+  <p>第 23 页：函数里的字符串 <code class="inline">"x=%d\n"</code> 属于<b>只读数据</b>，放在 .rodata 节。<br>
+  第 24 页：switch-case 语句，编译器会生成一张<b>跳转表</b>，这张表也放在目标文件的<b>只读节</b>中，按 4 字节边界对齐。原理是：先把 a 减去最小值（R[eax]=a-10=i），判断 if (a-10)&gt;7 就越界转 default，否则用 <code class="inline">.L8 + 4*i</code> 查表直接跳到对应 case——这就是 switch 比一长串 if-else 高效的原因。</p>
+</div>
+
+<div class="quiz" data-text="随堂题 P25：有关可重定位目标文件的叙述，错误的是？答案 B——.data 只放已初始化的全局变量，不是所有变量的初始值。">
+  <div class="qhead">随堂题 · P25（错误的是）</div>
+  <div class="opt">A. .text 节包含相应模块内所有机器代码</div>
+  <div class="opt">B. .data 节包含相应模块内所有变量的初始值</div>
+  <div class="opt">C. .rodata 节包含相应模块内所有只读数据</div>
+  <div class="opt">D. .rel.text 和 .rel.data 包含相应节内所有可重定位信息</div>
+  <div class="ans"><b>答案 B。</b> .data 只放<b>已初始化的全局变量</b>：未初始化的全局变量在 .bss，局部变量在栈上，都不在 .data。"所有变量的初始值"这个说法范围过大，故错误。</div>
+</div>
+
+<div class="block" id="l1-h">
+  <button class="speak" title="朗读本段">🔈</button>
+  <h3><span class="pgtag">P26–29</span> ELF 头与节头表：读 readelf 输出</h3>
+  <p>第 26 页用 <code class="inline">readelf -h main.o</code> 展示可重定位文件的 ELF 头，重点字段：</p>
+  <ul>
+    <li><b>Magic 魔数</b>：7f 45 4c 46，即 ASCII 的 \x7f ELF，用来识别这是 ELF 文件；</li>
+    <li><b>Class</b> ELF32、<b>Data</b> 小端（little endian）、<b>OS/ABI</b> UNIX-System V；</li>
+    <li><b>Type: REL</b>（可重定位文件）；<b>Machine: Intel 80386</b>；</li>
+    <li><b>Entry point address: 0x0</b>——可重定位文件没有入口地址；</li>
+    <li><b>Start of program headers: 0</b>，程序头表大小为 0——说明<b>可重定位文件没有程序头表</b>；</li>
+    <li><b>Start of section headers: 516</b>，节头表每表项 40 字节，共 15 项（15×40=600B）。</li>
+  </ul>
+  <p>第 27 页给出节头表表项结构 <code class="inline">Elf32_Shdr</code>（32 位下每项 40B），关键字段：sh_name（节名在 .strtab 的偏移）、sh_type（节类型）、sh_flags（访问属性 W 写/A 分配/X 执行）、sh_addr（可装入时的虚拟地址）、sh_offset（文件中偏移，.bss 无意义）、sh_size（节长度）、sh_link/sh_info（与链接相关的节用）、sh_addralign（对齐）、sh_entsize（表项长度）。</p>
+  <p>第 28–29 页用 <code class="inline">readelf -S test.o</code> 展示真实节头表：11 个节，.text 的 Flg=AX（可分配+可执行），.data/.bss 是 WA（可写+可分配），.rodata 是 A（只读）。并且强调<b>可重定位文件中每个可装入节的起始地址（Addr）总是 0</b>。</p>
+</div>
+
+<div class="block" id="l1-i">
+  <button class="speak" title="朗读本段">🔈</button>
+  <h3><span class="pgtag">P30–32</span> 可执行目标文件：和可重定位文件的区别</h3>
+  <p>第 30 页：可执行文件包含代码和数据，<b>所有变量和函数都已有确定的虚拟地址</b>，符号引用处已被重定位，没有扩展名（默认 a.out），可被 CPU 直接执行。为了能执行，还要把<b>具有相同访问属性的节合并成段</b>（Segment），并说明每个段的属性，这就是程序头表（段头表）的作用。</p>
+  <p>第 31 页列出可执行文件相对可重定位文件的<b>四点不同</b>（选择题常考）：</p>
+  <ol>
+    <li>ELF 头的 <code class="inline">e_entry</code> 字段给出第一条指令的地址（可重定位文件中为 0）；</li>
+    <li><b>多一个程序头表</b>（段头表），是结构数组；</li>
+    <li><b>多一个 .init 节</b>，定义 <code class="inline">_init</code> 函数做执行前的初始化；</li>
+    <li><b>少两个 .rel 节</b>（已经重定位完，不再需要）。</li>
+  </ol>
+  <p>第 32 页 <code class="inline">readelf -h main</code> 印证：Type 变成 <b>EXEC</b>，Entry point = 0x8048580，程序头表有 8 个表项（8×32B），节头表 29 项。</p>
+</div>
+
+<div class="block" id="l1-j">
+  <button class="speak" title="朗读本段">🔈</button>
+  <h3><span class="pgtag">P33–36</span> 存储器映像与程序头表</h3>
+  <p>第 33 页：<b>可执行文件与虚拟地址空间的存储器映像（memory mapping）由 ABI 规范定义</b>（i386 System V ABI）。这张图和第 13 页基本一致，只是加上了具体地址。可执行文件只有 4 个节会分配（A）空间：.text 可执行、.data/.bss 可读写、.rodata 只读；.symtab/.debug/.line/.strtab 这些调试信息<b>不会装入内存</b>。</p>
+  <p>第 34–35 页讲程序头表（<code class="inline">Elf32_Phdr</code>，每项 32B），它描述文件的节与虚拟空间存储段之间的映射关系。8 个表项里有 <b>2 个是可装入段（Type=LOAD）</b>：</p>
+  <ul>
+    <li><b>第一可装入段（只读代码段）</b>：文件第 0x0~0x4d3 字节（ELF 头+程序头表+.init+.text+.rodata），映射到虚拟地址 0x8048000 开始、长度 0x4d4 的区域，按 4KB 对齐，权限 RE（只读+执行）；</li>
+    <li><b>第二可装入段（读写数据段）</b>：文件第 0xf0c 起的 .data（0x108B），映射到 0x8049f0c 开始、长度 0x110 的区域；前 0x108B 用 .data 内容初始化，后 8B 是 .bss 初始化为 0，权限 RW（可读可写）。</li>
+  </ul>
+  <div class="tip">⭐ 注意"文件内容大小"和"内存大小"的差别：.bss 在文件里不占空间，但在内存里会被分配并清零——这正是 .bss 存在的意义。</div>
+</div>
+
+<div class="quiz" data-text="随堂题 P37：有关 ELF 目标文件格式的叙述，错误的是？分析：C 说数据都是补码形式不严谨（浮点数用 IEEE754、字符串用 ASCII）。答案 C。">
+  <div class="qhead">随堂题 · P37（错误的是）</div>
+  <div class="opt">A. 可重定位文件的 ELF 链接视图，由不同的节组成</div>
+  <div class="opt">B. 可执行目标文件是 ELF 执行视图，由不同的段组成</div>
+  <div class="opt">C. 可重定位和可执行目标文件中的数据都是二进制补码形式</div>
+  <div class="opt">D. 两种目标文件中的代码都是二进制指令形式</div>
+  <div class="ans"><b>参考答案 C。</b> A、B 正是"两种视图"的正确表述，D 也正确（代码都是机器指令）。C 的问题在于"数据都是补码"过于绝对：整型数值确实以补码表示，但浮点数用 IEEE 754、字符/字符串用 ASCII、地址是指针值，不能一概说"都是补码"。（此题重在理解两种视图与数据表示的区别。）</div>
+</div>
+
+<div class="summary" id="l1-k">
+  <h3>第一讲小结（P38）</h3>
+  <p>这一讲搭好了舞台：<b>程序的链接概述、意义与过程</b>，以及三种目标文件格式——<b>ELF 可重定位文件（链接视图，按节组织）</b>和 <b>ELF 可执行文件（执行视图，按段组织）</b>。核心结论：链接就是合并相同的节、给符号定地址、改写引用；.o 里地址从 0 开始，链接后变成虚拟地址。下一讲开始处理"符号"这件事。</p>
+</div>
+
+<!-- ======================= 第二讲 ======================= -->
+<div class="lecture l2" id="L2">
+  <div class="lecture-head">
+    <div><div class="num">LECTURE TWO</div><h2>第二讲 · 符号表与符号解析</h2></div>
+    <div class="pg">课件第 39–77 页</div>
+  </div>
+</div>
+
+<div class="block" id="l2-a">
+  <button class="speak" title="朗读本段">🔈</button>
+  <h3><span class="pgtag">P40–42</span> 三种链接器符号</h3>
+  <p>第 41 页：每个可重定位目标模块 m 都有一个符号表，包含 m 中定义的符号。链接器关心三种符号：</p>
+  <ul>
+    <li><b>Global symbols 全局符号</b>：由模块 m 定义、能被其他模块引用。例如非 static 的函数和非 static 的全局变量（如 main.c 里的 buf）。</li>
+    <li><b>External symbols 外部符号</b>：由其他模块定义、被模块 m 引用。例如 main.c 里的函数名 swap。</li>
+    <li><b>Local symbols 本地符号</b>：仅由模块 m 定义和引用，例如带 static 的函数和全局变量（如 swap.c 里的 bufp1）。</li>
+  </ul>
+  <div class="warn"><b>⚠ 最容易踩的坑：</b>链接器说的"本地符号"不是 C 语言里的"局部变量"！局部变量分配在栈上、是临时性的，根本不进符号表。课件第 41 页 L3 和第 42 页结尾都特意强调了这点。</div>
+  <p>第 42 页让你对 main.c / swap.c 分类：buf、bufp0、main、swap 是全局符号（其中 swap 在 main.c 里是外部引用）；bufp1 是本地符号；temp 是局部变量，不是符号。</p>
+</div>
+
+<div class="block" id="l2-b">
+  <button class="speak" title="朗读本段">🔈</button>
+  <h3><span class="pgtag">P43–44</span> 符号表的结构（Elf32_Symbol）</h3>
+  <p>第 43 页：<code class="inline">.symtab</code> 节记录符号表，是一个结构数组。函数名在 .text 节，变量名在 .data 或 .bss 节。每个条目结构如下：</p>
+  <pre><span class="k">typedef struct</span> {
+    Elf32_Word    st_name;    <span class="c">/* 符号名在 .strtab 中的偏移 */</span>
+    Elf32_Addr    st_value;   <span class="c">/* 在对应节中的偏移；可执行文件中是虚拟地址 */</span>
+    Elf32_Word    st_size;    <span class="c">/* 符号占的字节数 */</span>
+    <span class="k">unsigned char</span> st_info;    <span class="c">/* 低4位=类型(未指定/变量/函数/节)，高4位=绑定(本地/全局/弱) */</span>
+    <span class="k">unsigned char</span> st_other;   <span class="c">/* 可见性，均为 0 */</span>
+    Elf32_Section st_shndx;   <span class="c">/* 所在节：1=.text, 3=.data，或特殊值 */</span>
+} Elf_Symbol;</pre>
+  <p>特殊的 st_shndx 值：<b>ABS</b> 表示不该被重定位；<b>UND</b> 表示未定义（在别的模块）；<b>COM</b> 表示未初始化数据（.bss），此时 value 是对齐要求，size 是最小大小。</p>
+  <p>第 44 页给出真实符号表（<code class="inline">readelf -s</code> 风格）：</p>
+  <pre><span class="c">/* main.o 的最后三个条目（共10个） */</span>
+8: 0  8  Object Global  3    buf      <span class="c">// .data 节偏移0，全局对象，占8B</span>
+9: 0  33 Func   Global  1    main     <span class="c">// .text 节偏移0，全局函数，占33B</span>
+10: 0  0  Notype Global  UND  swap     <span class="c">// 未定义全局符号，类型大小未知</span>
+
+<span class="c">/* swap.o 的最后四个条目（共11个） */</span>
+8: 0  4  Object Global  3    bufp0    <span class="c">// .data 节偏移0，占4B</span>
+9: 0  0  Notype Global  UND  buf      <span class="c">// 未定义，来自 main.o</span>
+10: 0 36 Func   Global  1    swap     <span class="c">// .text 节偏移0，占36B</span>
+11: 4  4  Object Local   COM  bufp1    <span class="c">// 本地，未分配未初始化，4B对齐，占4B</span></pre>
+  <div class="quote">这张表后面还会用：<em class="hl">swap 在 main.o 里是第 10 项，buf 在 swap.o 里是第 9 项</em>。第三讲算重定位时，"r_sym=10 说明引用的是 swap"、"r_sym=9 说明引用的是 buf"，依据就在这里。</div>
+</div>
+
+<div class="quiz" data-text="随堂题 P46：有关链接符号类型，错误的是？答案 D——局部变量在栈上，不是链接器的局部符号。">
+  <div class="qhead">随堂题 · P46（错误的是）</div>
+  <div class="opt">A. 由模块 m 定义并能被其他模块引用的符号称为 m 的全局符号</div>
+  <div class="opt">B. 由其他模块定义并被 m 引用的称为 m 的外部符号</div>
+  <div class="opt">C. 由 m 定义并仅在 m 中引用的称为 m 的本地符号</div>
+  <div class="opt">D. 在模块 m 内某个函数中定义的局部变量称为 m 的局部符号</div>
+  <div class="ans"><b>答案 D。</b> 局部变量分配在栈上，不进符号表，不是链接器的局部（本地）符号。A/B/C 正是三类链接器符号的准确定义。</div>
+</div>
+
+<div class="block" id="l2-c">
+  <button class="speak" title="朗读本段">🔈</button>
+  <h3><span class="pgtag">P48–50</span> 强符号与弱符号</h3>
+  <p>第 48 页抛出一个问题：main.c 里 <code class="inline">int x=10;</code>，p1.c 里 <code class="inline">int x=20;</code>，会链接出错吗？带着这个问题往下看。</p>
+  <p>第 49 页讲<b>符号解析的目的</b>：把每个模块中引用的符号与某个目标模块中的定义符号建立关联。局部符号解析简单（本模块内唯一定义），全局符号涉及多个模块，较复杂。这里有个关键定义——<em class="hl">"符号的定义"实质是被分配了存储空间</em>（函数名→代码区，变量名→静态数据区），所有定义符号的值就是其目标所在的首地址。符号解析也叫<b>符号绑定</b>。</p>
+  <p>第 50 页给出强弱规则：</p>
+  <ul>
+    <li><b>强符号</b>：函数名 + 已初始化的全局变量名；</li>
+    <li><b>弱符号</b>：未初始化的全局变量名；</li>
+    <li><b>外部符号（UND 引用）没有强弱之分</b>。</li>
+  </ul>
+  <p>所以 <code class="inline">p1.c 的 int var=5;</code> 是强符号，<code class="inline">p2.c 的 int var;</code> 是弱符号。</p>
+</div>
+
+<div class="block">
+  <button class="speak" title="朗读本段">🔈</button>
+  <h3><span class="pgtag">P51–54</span> 弱符号的声明与用法</h3>
+  <p>第 51 页对 main.c / swap.c 逐个判断强弱：<code class="inline">buf[2]={1,2}</code> 是强符号，<code class="inline">bufp0=&amp;buf[0]</code> 已初始化也是强符号，<code class="inline">swap()</code> 函数定义是强符号；而 <code class="inline">bufp1</code> 是本地局部符号、<code class="inline">temp</code> 是局部变量——它们不参与强弱讨论；main.c 里对 buf、swap 的引用是外部引用，也无强弱。</p>
+  <p>第 52–54 页演示了 GCC 的弱符号扩展：<code class="inline">__attribute__((weak))</code> 可以把一个函数声明成弱符号：</p>
+  <pre><span class="k">void</span> <span class="k">__attribute__</span>((weak)) <span class="k">swap</span>();   <span class="c">// 把 swap 声明为弱符号</span>
+...
+<span class="k">if</span> (swap) swap();                       <span class="c">// 先判断是否为 NULL 再调用</span></pre>
+  <p>这样即使链接时没有 swap 的定义（引用的弱符号值为 0/NULL），程序也不会崩溃——<code class="inline">if(swap)</code> 判断为假就直接跳过。这是插件式、可选功能设计的常用技巧。</p>
+</div>
+
+<div class="block" id="l2-d">
+  <button class="speak" title="朗读本段">🔈</button>
+  <h3><span class="pgtag">P55</span> 链接器的符号解析三规则（核心考点）</h3>
+  <p>第 55 页给出三条规则，前提是"符号解析时只能有一个确定的定义（每个符号仅占一处存储空间）"：</p>
+  <ol>
+    <li><b>Rule 1：强符号不能多次定义</b>——强符号只能定义一次，否则链接错误；</li>
+    <li><b>Rule 2：一强多弱，取强</b>——若一个符号被定义为一次强符号和多次弱符号，按强定义为准，对弱符号的引用被解析为对强符号的引用；</li>
+    <li><b>Rule 3：多个弱符号，任选一个</b>——若有多个弱符号定义，任选其一。用 <code class="inline">gcc -fno-common</code> 链接时，遇到多个弱定义的全局符号会输出警告。</li>
+  </ol>
+  <div class="tip">⭐ 三条规则一定要能背下来，并会用来判断程序是否链接出错、打印结果是什么。第 56–58 页就是三个实战例子。</div>
+</div>
+
+<div class="block" id="l2-e">
+  <button class="speak" title="朗读本段">🔈</button>
+  <h3><span class="pgtag">P56–58</span> 多重定义的三个例子</h3>
+  <p><b>例1（P56）：</b>回到开头的问题——main.c 的 <code class="inline">int x=10;</code> 和 p1.c 的 <code class="inline">int x=20;</code>。main 只有一次强定义，p1 有一次强定义，但 <b>x 有两次强定义</b>，违反 Rule 1，<em class="hl">链接器报错</em>。</p>
+  <p><b>例2（P57）：</b>main.c 里 <code class="inline">int y=100; int z;</code>，p1.c 里 <code class="inline">int y; int z;</code>。分析：y 是"一强一弱"→按 Rule 2 取强的（main.c 的 y=100）；z 是"两次弱定义"→按 Rule 3 任选一个存储位置，两处引用都指向它。p1() 里执行 <code class="inline">y=200; z=2000;</code>，所以最终打印 <b>y=200，z=2000</b>。这个例子说明：<em class="hl">在两个不同模块定义相同变量名，很可能发生意想不到的结果</em>——你以为是两个变量，其实链接后是同一个！</p>
+  <p><b>例3（P58）：</b>更隐蔽。main.c 里 <code class="inline">int d=100; int x=200;</code>（d 是 int），p1.c 里 <code class="inline">double d;</code>（d 是 double，未初始化=弱）。d 一强一弱按强的，所以是 int 型、占 4 字节；但 p1() 执行 <code class="inline">d=1.0</code> 时用的是 <code class="inline">FSTPl &amp;d</code>——这是<b>双精度存储指令，写 8 字节</b>！于是把 d 后面的 4 字节（正好是 x）也覆盖了。1.0 的 double 编码是 0x3FF0000000000000，低 4 字节 00000000 写入 d，高 4 字节 3FF00000（十进制 1072693248）写入 x。所以打印 <b>d=0，x=1072693248</b>。这个例子说明：<em class="hl">两个重复定义且类型不同的变量，更容易产生难以理解的结果</em>。</p>
+  <div class="warn"><b>⚠ 这正是"链接知识有啥用"的最好回答：</b>这类错误编译时不会有任何警告，程序可能跑很久才在某个莫名其妙的地方出错，且错误现象离真正的原因十万八千里。不了解链接器，你根本无从查起。</div>
+</div>
+
+<div class="block">
+  <button class="speak" title="朗读本段">🔈</button>
+  <h3><span class="pgtag">P59</span> 符号定义的注意事项</h3>
+  <p>第 59 页给出编程建议：</p>
+  <ul>
+    <li><b>尽量避免使用全局变量</b>；</li>
+    <li>一定要用就遵守规则：尽量用 <code class="inline">static</code>（本地化）、全局变量要赋初值（成为强符号、可控）、外部全局变量要用 <code class="inline">extern</code> 声明。</li>
+  </ul>
+  <p>课件强调：多重定义全局变量造成的错误是<b>默默发生的</b>——编译系统不警告，程序执行很久后才表现，且远离错误引发处。在几百个模块的大型软件里极难修正。所以大部分程序员不了解链接器，而你要养成好习惯。</p>
+</div>
+
+<div class="quiz" data-text="随堂题 P61：有关强弱符号定义，错误的是？答案 B——并非所有出现的函数名都是强符号，extern 声明的函数引用、weak 声明的函数都不是强符号。">
+  <div class="qhead">随堂题 · P61（错误的是）</div>
+  <div class="opt">A. 局部符号没有强弱符号的概念</div>
+  <div class="opt">B. 所有出现的函数名都是强符号</div>
+  <div class="opt">C. 没有初始化的全局变量名是弱符号</div>
+  <div class="opt">D. 已初始化的全局变量名是强符号</div>
+  <div class="ans"><b>答案 B。</b> "出现"的函数名不一定是定义——extern 声明的函数只是外部引用（UND），没有强弱；用 <code class="inline">__attribute__((weak))</code> 声明的函数也可以是弱符号（第 53 页）。A/C/D 都符合定义。</div>
+</div>
+
+<div class="quiz" data-text="随堂题 P62：有关强弱符号解析，错误的是？答案 D——一个符号若仅出现在引用处而没有定义，会导致链接错误（undefined reference）。">
+  <div class="qhead">随堂题 · P62（错误的是）</div>
+  <div class="opt">A. 一个符号名只能有一个强符号，否则符号解析失败</div>
+  <div class="opt">B. 一个符号名可以有多个弱符号，任选一个为其定义</div>
+  <div class="opt">C. 一个符号名可以有一个强符号和多个弱符号，强符号为其定义</div>
+  <div class="opt">D. 一个符号名可以仅出现在引用处或仅出现在定义处</div>
+  <div class="ans"><b>答案 D。</b> 若一个符号仅出现在引用处、没有任何模块定义它，链接就会报 "undefined reference" 错误（弱引用除外）。A/B/C 正是解析三规则的复述。</div>
+</div>
+
+<div class="block" id="l2-f">
+  <button class="speak" title="朗读本段">🔈</button>
+  <h3><span class="pgtag">P64–68</span> 静态共享库（.a 归档文件）</h3>
+  <p>第 64 页先抛出场景：func.o 调用 libx.a 和 liby.a 中的函数，libx.a 又调用 libz.a，而 libx.a 与 liby.a 之间、liby.a 与 libz.a 相互独立——该怎么链接？这就是"库"的问题。</p>
+  <p>第 65 页：<b>静态库（.a archive files）</b>就是把所有相关的目标模块（.o）打包成一个单独的库文件，也叫存档文件 archive。它增强了链接器功能——链接器能通过查找库文件中的符号来解析符号。构建可执行文件时只需指定库文件名，链接器会<b>自动到库中寻找应用程序用到的目标模块，只把用到的模块拷贝出来</b>。C 标准库 libc.a 是默认库，gcc 命令行无需显式指定。</p>
+  <p>第 66 页讲创建：<code class="inline">ar rcs libc.a atoi.o printf.o ... random.o</code>。归档器 ar 允许<b>增量更新</b>——只重新编译修改的源码、把新 .o 替换进库即可。</p>
+  <p>第 67 页列常用库：<code class="inline">libc.a</code>（C 标准库，约 1392 个目标文件、8MB，含 I/O、存储分配、信号处理、字符串、时间日期、随机数、定点整数运算）；<code class="inline">libm.a</code>（数学库，约 401 个目标文件、1MB，含 sin/cos/tan/log/exp/sqrt 等浮点运算）。</p>
+  <p>第 68 页自定义库示例：把 myproc1.o、myproc2.o 打包成 mylib.a，<code class="inline">gcc -c main.c</code> 后 <code class="inline">gcc -static -o myproc main.o ./mylib.a</code>，调用关系是 main→myfunc1→printf。问题：符号解析怎么进行？</p>
+</div>
+
+<div class="block" id="l2-g">
+  <button class="speak" title="朗读本段">🔈</button>
+  <h3><span class="pgtag">P69–71</span> 符号解析全过程：E / U / D 三集合算法（重点）</h3>
+  <p>这是第二讲最重要的算法。链接器维护三个集合：</p>
+  <ul>
+    <li><b>E</b>：将被合并以组成可执行文件的所有目标文件集合；</li>
+    <li><b>U</b>：当前所有<b>未解析的引用</b>符号集合；</li>
+    <li><b>D</b>：当前所有<b>已定义</b>符号集合。</li>
+  </ul>
+  <p>以 main→myfunc1→printf 为例，从头走一遍：</p>
+  <ol>
+    <li>初始 E、U、D 为空。<b>扫描 main.o</b>：加入 E；main 进 D；myfunc1 进 U。</li>
+    <li><b>扫描 mylib.a</b>：把 U 中的符号（myfunc1）和库中所有模块（myproc1.o、myproc2.o）依次匹配，发现 myproc1.o 定义了 myfunc1 → myproc1.o 加入 E，myfunc1 从 U 移到 D。myproc1.o 里又引用了 printf → printf 进 U。不断迭代直到 U、D 不再变化。此时 U 只剩 printf，而 <b>myproc2.o 没被加入 E，被丢弃</b>。</li>
+    <li><b>扫描默认库 libc.a</b>：printf.o 定义了 printf → printf 从 U 移到 D，printf.o 加入 E，同时把它定义的符号加入 D、它引用的未解析符号加入 U。处理完 libc.a 时，<b>U 一定是空的，D 中符号唯一</b>。</li>
+  </ol>
+  <p>最终结果（P70）：E 中有 main.o、myproc1.o、printf.o 及其调用的模块；D 中有 main、myfunc1、printf 及其引用符号。注意 <b>E 中没有 myproc2.o</b>——这就是静态库"只取所需"的精髓。</p>
+  <div class="tip">⭐ 这个 E/U/D 算法要能自己推演。它直接解释了下一页的"链接顺序问题"。</div>
+</div>
+
+<div class="block" id="l2-h">
+  <button class="speak" title="朗读本段">🔈</button>
+  <h3><span class="pgtag">P71–73</span> 链接顺序问题（高频考点）</h3>
+  <p>第 71 页：如果把命令写成 <code class="inline">gcc -static -o myproc ./mylib.a main.o</code>（库放在 .o 前面），结果怎样？</p>
+  <ul>
+    <li>先扫描 mylib.a，此时 U 为空——链接器认为没有任何符号需要解析，于是 <b>myproc1.o 和 myproc2.o 都被丢弃</b>；</li>
+    <li>再扫描 main.o，把 myfunc1 加入 U，但此后没有库了，myfunc1 <b>始终无法解析</b>；</li>
+    <li>→ <em class="hl">链接错误！</em>因为它只能用 mylib.a 里的符号解析，而库里的 .o 已经被丢弃了。</li>
+  </ul>
+  <p>第 72 页总结链接器对外部引用的解析算法要点：<b>按命令行顺序扫描 .o 和 .a；扫描中把未解析引用记入 U；每遇到一个新模块就试图用它解析 U 中的符号；扫到最后 U 还有符号就出错</b>。对策：<em class="hl">能否正确解析与命令行顺序有关，好的做法是把静态库放在命令行最后</em>。</p>
+  <p>第 73 页给出库间依赖的顺序规则：</p>
+  <ul>
+    <li>若 libx.a→libz.a，且 libx.a、liby.a 独立：以下都行——<code class="inline">func.o libx.a liby.a libz.a</code>、<code class="inline">func.o liby.a libx.a libz.a</code>、<code class="inline">func.o libx.a libz.a liby.a</code>（原则：被调用的库排在调用者后面）。</li>
+    <li>若 libx.a 和 liby.a <b>相互依赖</b>：要<b>重复写库</b>——<code class="inline">func.o libx.a liby.a libx.a</code> 或 <code class="inline">func.o liby.a libx.a liby.a</code>。</li>
+  </ul>
+</div>
+
+<div class="block">
+  <button class="speak" title="朗读本段">🔈</button>
+  <h3><span class="pgtag">P74</span> 如何划分模块</h3>
+  <p>第 74 页：许多函数无需自己写，用共享库即可（数学库、I/O 库、存储管理、字符串处理）。要避免两种极端：<b>所有函数放一个源文件</b>（改一个函数要重编全部，时间和空间效率都低）和<b>一个源文件只放一个函数</b>（模块太多太繁琐、需显式链接）。要折中。</p>
+</div>
+
+<div class="quiz" data-text="随堂题 P76：相互依赖库的正确静态链接命令。答案 A——func1.o func2.o libx.a liby.a libx.a。">
+  <div class="qhead">随堂题 · P76（能正确静态链接的命令）</div>
+  <p style="font-size:14px">条件：func1.o→func2.o，func1.o→libx.a，func2.o→libx.a，libx.a ⇄ liby.a 相互依赖。</p>
+  <div class="opt">A. gcc -static -o myfunc func1.o func2.o libx.a liby.a libx.a</div>
+  <div class="opt">B. gcc -static -o myfunc func2.o func1.o liby.a libx.a liby.a</div>
+  <div class="opt">C. gcc -static -o myfunc libx.a liby.a libx.a func1.o func2.o</div>
+  <div class="opt">D. gcc -static -o myfunc liby.a libx.a liby.a func1.o func2.o</div>
+  <div class="ans"><b>答案 A。</b> 两条原则：① .o 必须在库前（C、D 把库放最前，扫描库时 U 为空，全被丢弃，错）；② 库内部 libx.a 被 func1.o/func2.o 直接依赖，必须先扫 libx.a，且相互依赖要重复成 libx.a liby.a libx.a。A 完全符合。B 把 liby.a 放最前，第一次扫描时 U 里还没有 liby 的符号，会被丢弃，结尾又缺 libx.a 兜底，故不正确。</div>
+</div>
+
+<div class="summary" id="l2-i">
+  <h3>第二讲小结（P75–77）</h3>
+  <p>三件事：<b>① 三类符号</b>（全局/外部/本地，注意本地≠局部变量）；<b>② 强弱特性</b>（函数名和已初始化全局变量是强符号，未初始化全局变量是弱符号，解析三规则）；<b>③ 符号解析过程</b>（E/U/D 算法、静态库、<em class="hl">库放最后</em>、相互依赖的库要重复写）。下一讲解决链接的第二大步——重定位。</p>
+</div>
+
+<!-- ======================= 第三讲 ======================= -->
+<div class="lecture l3" id="L3">
+  <div class="lecture-head">
+    <div><div class="num">LECTURE THREE</div><h2>第三讲 · 重定位与动态链接</h2></div>
+    <div class="pg">课件第 78–108 页</div>
+  </div>
+</div>
+
+<div class="block" id="l3-a">
+  <button class="speak" title="朗读本段">🔈</button>
+  <h3><span class="pgtag">P79–81</span> 重定位的三步</h3>
+  <p>第 80 页用前面的符号程序回顾了链接四件事：符号绑定、同节合并、确定地址、修改引用。第 81 页正式给出<b>符号解析完成后，重定位分三步</b>：</p>
+  <ol>
+    <li><b>合并相同的节</b>：把集合 E 中所有目标模块里相同的节合并成新节（所有 .text 合成一个 .text）；</li>
+    <li><b>对定义符号重定位（确定地址）</b>：确定新节中所有定义符号在虚拟地址空间中的地址——为函数定首地址进而定每条指令地址，为变量定首地址；完成后每条指令和每个全局变量都有地址；</li>
+    <li><b>对引用符号重定位（修改引用）</b>：修改 .text 和 .data 中对每个符号的引用（地址），要用到 .rel_data 和 .rel_text 节中的重定位信息。</li>
+  </ol>
+</div>
+
+<div class="block" id="l3-b">
+  <button class="speak" title="朗读本段">🔈</button>
+  <h3><span class="pgtag">P82</span> 重定位信息与两种重定位类型</h3>
+  <p>第 82 页：<b>汇编器遇到引用时就生成一个重定位条目</b>。数据引用的条目在 .rel_data 节，指令中引用的在 .rel_text 节。条目格式：</p>
+  <pre><span class="k">typedef struct</span> {
+    <span class="k">int</span> offset;              <span class="c">/* 节内偏移：要修改的位置 */</span>
+    <span class="k">int</span> symbol : 24,        <span class="c">/* 所绑定的符号 */</span>
+        type   : 8;         <span class="c">/* 重定位类型 */</span>
+} Elf32_Rel;</pre>
+  <p>IA-32 有两种最基本的重定位类型：</p>
+  <ul>
+    <li><b>R_386_32</b>：绝对地址方式；</li>
+    <li><b>R_386_PC32</b>：PC 相对地址方式。</li>
+  </ul>
+  <p>课件举例：在 .rel.text 中有条目 <code class="inline">offset=0x1, symbol=B, type=R_386_32</code>；另有 <code class="inline">offset=0x6, symbol=L0, type=R_386_PC32</code>。课件随堂问："重定位条目和汇编后的机器代码在哪种目标文件里？" 答案是<b>在可重定位目标（.o）文件里</b>。</p>
+  <div class="warn"><b>⚠ 易错：</b>第 98 页的随堂题就考这里——重定位条目是<b>汇编器 as</b> 在汇编时产生的，不是编译器！</div>
+</div>
+
+<div class="block" id="l3-c">
+  <button class="speak" title="朗读本段">🔈</button>
+  <h3><span class="pgtag">P83–88</span> 例：main.o 中对 swap 的重定位（R_386_PC32）</h3>
+  <p>回到 main.c / swap.c。第 84 页：符号解析后 E 中有 main.o 和 swap.o（没有 printf.o，因为没调用 printf），D 中有所有定义符号。用 <code class="inline">readelf -r main.o</code> 看重定位条目。</p>
+  <p>第 86 页反汇编 main.o 的 .text：</p>
+  <pre>00000000 &lt;main&gt;:
+  0: 55              push   %ebp
+  1: 89 e5           mov    %esp,%ebp
+  3: 83 e4 f0        and    $0xfffffff0,%esp
+  6: e8 fc ff ff ff  call   7 &lt;main+0x7&gt;
+          <span class="s">7: R_386_PC32  swap</span>     <span class="c">// ← call 的操作数 0xfffffffc = -4 要被改</span>
+  b: b8 00 00 00 00  mov    $0x0,%eax
+ 10: c9              leave
+ 11: c3              ret</pre>
+  <p>指令在节内偏移 0x6 处调用 swap，操作数是 -4（初始占位值）。重定位条目为 <code class="inline">r_offset=0x7, r_sym=10, r_type=R_386_PC32</code>——第 87 页提醒：<b>r_sym=10 正是 main.o 符号表里 swap 的编号</b>，说明引用的是 swap。</p>
+  <p><b>第 88 页详细计算（重点）：</b>假定可执行文件中 main（18 字节=0x12）从 0x8048380 开始，swap 紧跟其后按 4 字节对齐 → swap 起始地址 = 0x8048380+0x12 = 0x8048392，对齐后是 <b>0x8048394</b>（中间补两条 nop）。</p>
+  <ul>
+    <li>call 指令的下一条指令地址（即执行时的 PC）= 0x8048380 + 0x07 − (−4) = <b>0x804838b</b>（注意那个 −4 是机器码里的初始占位值 init）；</li>
+    <li>重定位值 = 转移目标 − PC = 0x8048394 − 0x804838b = <b>0x9</b>；</li>
+    <li>所以 call 的机器码从 <code class="inline">e8 fc ff ff ff</code> 改成 <code class="inline">e8 09 00 00 00</code>。</li>
+  </ul>
+  <div class="formula">PC 相对方式重定位值公式：<br>ADDR(r_sym) − ( ( ADDR(.text) + r_offset ) − init )<br>其中 ADDR(.text)+r_offset−init = call 下一条指令地址 = 当前 PC</div>
+</div>
+
+<div class="block" id="l3-d">
+  <button class="speak" title="朗读本段">🔈</button>
+  <h3><span class="pgtag">P89–92</span> 例：swap.o 中对 buf 的重定位（R_386_32）</h3>
+  <p>第 90 页看 .data 节。main.o 的 buf 定义在 .data 偏移 0 处、占 8B（内容 01 00 00 00 02 00 00 00），没有需重定位的符号。swap.o 里 <code class="inline">bufp0 = &amp;buf[0]</code> 定义在 .data 偏移 0、占 4B，初值是 0x0（占位），因为 buf 是外部符号，这里需要重定位：</p>
+  <pre>00000000 &lt;bufp0&gt;:
+  0: 00 00 00 00
+        <span class="s">0: R_386_32  buf</span>    <span class="c">// r_offset=0x0, r_sym=9, r_type=R_386_32</span></pre>
+  <p>第 91 页提醒：<b>r_sym=9 是 swap.o 符号表里 buf 的编号</b>，说明引用的是 buf。</p>
+  <p><b>第 92 页计算：</b>假定合并后 ADDR(buf)=0x8049620。buf 和 bufp0 同属 .data，被合并，bufp0 紧跟 buf 之后 → bufp0 地址 = 0x8049620+8 = 0x8049628。因为是 R_386_32（绝对地址），bufp0 的内容被改成 buf 的绝对地址 <b>0x8049620</b>，小端存储即字节 <code class="inline">20 96 04 08</code>。</p>
+  <div class="formula">绝对地址方式：重定位值 = ADDR(定义符号) + 占位值(init，通常为 0)<br>R_386_32 直接填入符号的绝对地址；R_386_PC32 填入「目标地址 − 当前PC」的差值。</div>
+</div>
+
+<div class="block" id="l3-e">
+  <button class="speak" title="朗读本段">🔈</button>
+  <h3><span class="pgtag">P93–94</span> swap.o 的六处重定位</h3>
+  <p>第 93 页反汇编 swap.o 的 .text，标出<b>共 6 处需要重定位</b>（偏移 8、c、11、1b、21、2a）。第 94 页逐一算出填入值：</p>
+  <ul>
+    <li>已知：buf=0x8049620，bufp0=0x8049628，<code class="inline">&amp;buf[1]</code> = 0x8049620+4 = 0x8049624，bufp1 是 .bss 首地址，假定 0x8049700；</li>
+    <li>8 处（bufp1 地址）→ <code class="inline">00 97 04 08</code></li>
+    <li>c 处（&amp;buf[1]）→ <code class="inline">24 96 04 08</code></li>
+    <li>11 处（bufp0）→ <code class="inline">28 96 04 08</code></li>
+    <li>1b 处（bufp0）→ <code class="inline">28 96 04 08</code></li>
+    <li>21 处（bufp1）→ <code class="inline">00 97 04 08</code></li>
+    <li>2a 处（bufp1）→ <code class="inline">00 97 04 08</code></li>
+  </ul>
+  <div class="tip">⭐ 第 85 页还特别强调：<b>虽然 bufp1 是 swap 的本地符号，也需要在 .bss 节重定位</b>——因为 .o 里的地址都是相对的，合并成可执行文件后都要换成真实地址，本地符号也不例外。</div>
+</div>
+
+<div class="block" id="l3-f">
+  <button class="speak" title="朗读本段">🔈</button>
+  <h3><span class="pgtag">P95</span> 重定位后的完整代码</h3>
+  <p>第 95 页给出最终可执行文件中的样子。main 中 call 已经指向真实的 swap 地址：</p>
+  <pre>08048380 &lt;main&gt;:
+ 8048386: e8 09 00 00 00   call   8048394 &lt;swap&gt;   <span class="c">// 已重定位！</span>
+ 8048392: 90  nop
+ 8048393: 90  nop                              <span class="c">// 4字节对齐填充</span>
+
+08048394 &lt;swap&gt;:
+ 804839a: c7 05 00 97 04 08 24 96 04 08   movl $0x8049624, 0x8049700   <span class="c">// bufp1=&buf[1]</span>
+ 80483a4: a1 28 96 04 08        mov 0x8049628, %eax    <span class="c">// temp=*bufp0</span>
+ 80483b3: 8b 15 00 97 04 08     mov 0x8049700, %edx    <span class="c">// *bufp0=*bufp1</span>
+ 80493bd: a1 00 97 04 08        mov 0x8049700, %eax    <span class="c">// *bufp1=temp</span></pre>
+  <p>课件还要求写出 call 指令的功能描述（R[eip] 此时=0x804838b）：① R[esp]←R[esp]−4（压栈）；② M[R[esp]]←R[eip]（把返回地址压栈）；③ R[eip]←R[eip]+0x9（跳到 swap）。这正是 <code class="inline">call</code> 的语义。</p>
+</div>
+
+<div class="summary" id="l3-g1">
+  <h3>重定位小结（P96）</h3>
+  <p><b>三步</b>：同节合并 → 确定地址 → 修改引用。<b>两种类型</b>：R_386_32（绝对地址，填符号真实地址）、R_386_PC32（PC 相对，填「目标−当前PC」的差值）。</p>
+</div>
+
+<div class="quiz" data-text="随堂题 P97：有关重定位功能，错误的是？答案 B——'将具有相同存储属性的节合并成段'属于形成执行视图的映射，不是重定位本身的步骤。">
+  <div class="qhead">随堂题 · P97（错误的是）</div>
+  <div class="opt">A. 重定位的最终目标是重新确定各模块合并后每个引用所指向的目标地址</div>
+  <div class="opt">B. 重定位第一步应先将相同节合并，且将具有相同存储属性的节合并成段</div>
+  <div class="opt">C. 第二步是确定每个段的起始地址，并确定段内每个定义处符号的地址</div>
+  <div class="opt">D. 最后一步是将引用处的地址修改为关联定义处的首地址</div>
+  <div class="ans"><b>参考答案 B。</b> 重定位第一步是"合并相同的节"；而"把具有相同存储属性的节合并成段"是为生成可执行文件执行视图而做的<b>段映射</b>（程序头表的工作），把它说成重定位的步骤不够准确。A/C/D 都是对重定位三步和目标的正确描述。</div>
+</div>
+
+<div class="quiz" data-text="随堂题 P98：有关重定位信息，错误的是？答案 A——重定位条目由汇编器 as 在汇编时产生，不是编译器。">
+  <div class="qhead">随堂题 · P98（错误的是）</div>
+  <div class="opt">A. 重定位信息是由编译器在生成汇编指令时产生的</div>
+  <div class="opt">B. 指令中的重定位信息在可重定位目标文件的 .rel.text 节中</div>
+  <div class="opt">C. 数据中的重定位信息在可重定位目标文件的 .rel.data 节中</div>
+  <div class="opt">D. 重定位信息包含需要重定位的位置、绑定的符号和重定位类型</div>
+  <div class="ans"><b>答案 A。</b> 课件第 82 页明确："<b>汇编器</b>遇到引用时，生成一个重定位条目"。是 as 在汇编阶段产生，不是编译器 cc1。B/C/D 分别对应 .rel.text、.rel.data 和 Elf32_Rel 三个字段（offset/symbol/type），均正确。</div>
+</div>
+
+<div class="block" id="l3-g">
+  <button class="speak" title="朗读本段">🔈</button>
+  <h3><span class="pgtag">P100–101</span> 为什么要动态链接：静态库的缺点</h3>
+  <p>第 100 页回顾静态库。第 101 页指出静态库的三个缺点：</p>
+  <ol>
+    <li>库函数（如 printf）被包含进<b>每个运行进程</b>的代码段——上百个进程并发时，主存里就有上百份 printf，极大浪费内存；</li>
+    <li>库函数被合并进每个可执行文件——磁盘上几千个可执行文件各带一份，极大浪费磁盘；</li>
+    <li>库更新困难——程序员要关注新版本、下载、重新编译链接，使用不便。</li>
+  </ol>
+  <p>解决方案是<b>共享库 Shared Libraries</b>：它也是一个含代码数据的目标文件，但<b>从程序中分离出来，磁盘和内存中都只有一份备份</b>，可以动态地在装入时或运行时加载链接。Windows 叫动态链接库 .dll，Linux 叫动态共享对象 .so。</p>
+</div>
+
+<div class="block">
+  <button class="speak" title="朗读本段">🔈</button>
+  <h3><span class="pgtag">P102</span> 动态链接的两种方式</h3>
+  <p>第 102 页：动态链接有两种时机：</p>
+  <ul>
+    <li><b>装入时链接（load-time linking）</b>：第一次加载并运行时进行，Linux 通常由动态链接器 <code class="inline">ld-linux.so</code> 自动处理，标准 C 库 libc.so 通常按这种方式；</li>
+    <li><b>运行时链接（run-time linking）</b>：程序已经开始运行后进行，Linux 通过 <code class="inline">dlopen()</code> 等接口实现，用于分发软件包、构建高性能 Web 服务器等。</li>
+  </ul>
+  <p>共享库的好处：内存中只有一份备份被所有进程共享（省内存）；一个 .so 文件被所有程序共享（省磁盘）；升级时自动加载、程序动态链接（方便）；可分模块、用不同语言开发（效率高）；第三方共享库可作插件，功能易扩展。</p>
+</div>
+
+<div class="block" id="l3-h">
+  <button class="speak" title="朗读本段">🔈</button>
+  <h3><span class="pgtag">P103</span> 位置无关代码 PIC</h3>
+  <p>第 103 页：动态链接用到一个重要概念——<b>位置无关代码（Position-Independent Code, PIC）</b>，GCC 用 <code class="inline">-fPIC</code> 选项生成。共享库代码就是 PIC：它的位置可以是不确定的，即使长度变化也不影响调用它的程序。<em class="hl">引入 PIC 的目的：链接器无需修改代码，就能把共享库加载到任意地址运行</em>。</p>
+  <p>课件列出四类引用情况（L2）：① 模块内的过程调用、跳转用 PC 相对偏移寻址；② 模块内数据访问（模块内全局/静态变量）；③ 模块外的过程调用、跳转；④ 模块外的数据访问（外部变量）。第②③类（跨模块）是 PIC 要重点解决的问题，通常借助 GOT（全局偏移表）和 PLT（过程链接表）实现——本课程点到为止，你只需知道"要实现动态链接，必须生成 PIC 代码"。</p>
+</div>
+
+<div class="summary">
+  <h3>动态链接小结（P104）与思政点</h3>
+  <p>要能<b>辩证看待静态链接和动态链接的优缺点</b>，针对具体需求选择合适的链接方式，建立工程思维。静态链接：程序自包含、独立运行快，但空间冗余、更新要重编；动态链接：省空间、易更新、可插件化，但运行时依赖库、有加载开销。</p>
+</div>
+
+<div class="quiz" data-text="随堂题 P106：有关动态链接，错误的是？答案 C——动态链接生成的可执行文件是静态链接器ld做出的部分链接文件，不是由动态链接器在生成时链接的。">
+  <div class="qhead">随堂题 · P106（错误的是）</div>
+  <div class="opt">A. 共享库在 Linux 下称 .so，Windows 下称 .dll</div>
+  <div class="opt">B. 生成的可执行目标文件是部分链接的，其中还有部分引用没有进行重定位</div>
+  <div class="opt">C. 可执行目标文件由动态链接器对可重定位目标文件和共享库中部分信息进行链接而成</div>
+  <div class="opt">D. 加载或执行时，系统调出动态链接器利用共享库对其进行动态链接</div>
+  <div class="ans"><b>答案 C。</b> 生成（部分链接的）可执行文件仍然是<b>静态链接器 ld</b> 在构建时完成的，只是把对共享库的引用保留下来；<b>动态链接器 ld-linux.so</b> 是在程序<b>加载/运行时</b>才介入完成链接的（这正是 D 所说的）。C 把两者职责和时间点搞混了。A/B/D 均正确。</div>
+</div>
+
+<div class="quiz" data-text="随堂题 P107：静态链接与动态链接比较，错误的是？答案 D——静态库函数在链接（构建）时就链接进可执行文件，不是在加载时。">
+  <div class="qhead">随堂题 · P107（错误的是）</div>
+  <div class="opt">A. 静态库函数代码在进程代码段中，共享库函数代码不在</div>
+  <div class="opt">B. 静态库函数代码在可执行目标文件中，共享库函数代码不在</div>
+  <div class="opt">C. 静态库函数更新后需重新编译链接；共享库函数代码不包含在可执行文件中</div>
+  <div class="opt">D. 静态库函数在加载时被链接，而共享库函数可在加载或运行时被链接</div>
+  <div class="ans"><b>答案 D。</b> 静态库函数在<b>链接（构建可执行文件时）</b>就被拷贝进可执行文件，不是"加载时"；只有共享库才在加载/运行时链接。A/B/C 都是静态、动态链接的正确对比。</div>
+</div>
+
+<div class="summary" id="l3-i">
+  <h3>第 4 章本章小结（P105、108）</h3>
+  <p>整章串起来就是一条线：</p>
+  <ol>
+    <li><b>符号与符号表</b>——符号分全局/外部/本地，存在 .symtab 里；</li>
+    <li><b>全局符号的强弱特性</b>——强/弱的区分与多重定义解析三规则；</li>
+    <li><b>符号解析过程</b>——E/U/D 算法、静态库、链接顺序；</li>
+    <li><b>重定位的步骤与类型</b>——合并节/定地址/改引用，R_386_32 与 R_386_PC32；</li>
+    <li><b>静态链接与动态链接</b>——共享库、两种动态链接方式、PIC。</li>
+  </ol>
+  <p style="color:var(--brand);font-weight:600;margin-top:12px">能走到这里，你已经把 108 页课件完整地"听"了一遍。祝考试顺利！</p>
+</div>
+
+<div class="foot">第11次课 · 程序的链接 · 逐页讲解稿 · 配套 108 页课件生成</div>
+
+</div>
+
+<script>
+(function(){
+  const synth = window.speechSynthesis;
+  const status = document.getElementById('status');
+  const rateSel = document.getElementById('rate');
+  const speakBtns = [...document.querySelectorAll('.speak')];
+  const blocks = [...document.querySelectorAll('.block, .quiz, .summary')];
+  let queue = [], qi = 0, playingAll = false;
+  let zhVoice = null;
+
+  function pickVoice(){
+    const vs = synth.getVoices();
+    zhVoice = vs.find(v=>/zh[-_]?CN/i.test(v.lang)) || vs.find(v=>/^zh/i.test(v.lang)) || null;
+  }
+  if(synth){
+    pickVoice();
+    synth.onvoiceschanged = pickVoice;
+  }
+
+  function setStatus(t){ status.textContent = t; }
+
+  function clearPlaying(){
+    speakBtns.forEach(b=>b.classList.remove('playing'));
+  }
+
+  function speakText(text, onend){
+    if(!synth){ setStatus('当前浏览器不支持语音朗读'); return; }
+    synth.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'zh-CN';
+    u.rate = parseFloat(rateSel.value) || 1;
+    u.pitch = 1;
+    if(zhVoice) u.voice = zhVoice;
+    u.onend = ()=>{ if(onend) onend(); };
+    u.onerror = ()=>{ setStatus('朗读出错，请重试'); clearPlaying(); };
+    synth.speak(u);
+  }
+
+  // 单段朗读
+  speakBtns.forEach((btn)=>{
+    btn.addEventListener('click', ()=>{
+      const block = btn.closest('.block');
+      if(!block) return;
+      // 若正在读这段则停止
+      if(btn.classList.contains('playing')){
+        synth.cancel(); clearPlaying(); setStatus('已停止'); return;
+      }
+      clearPlaying();
+      btn.classList.add('playing');
+      const text = block.innerText.replace(/🔈/g,'').trim();
+      playingAll = false;
+      setStatus('正在朗读本段…');
+      speakText(text, ()=>{ btn.classList.remove('playing'); setStatus('本段朗读完毕'); });
+    });
+  });
+
+  function cleanForSpeech(el){
+    let t = el.innerText.replace(/🔈/g,'').replace(/随堂题/g,'随堂题。');
+    return t.trim();
+  }
+
+  function playNext(){
+    if(!playingAll) return;
+    if(qi >= queue.length){
+      clearPlaying(); setStatus('✅ 全部朗读完毕'); return;
+    }
+    const el = queue[qi];
+    const title = el.querySelector('h3, .qhead');
+    setStatus('朗读中 '+(qi+1)+'/'+queue.length+'：'+(title?title.innerText.replace('🔈',''):''));
+    // 滚动到当前段
+    el.scrollIntoView({behavior:'smooth', block:'center'});
+    speakText(cleanForSpeech(el), ()=>{ qi++; playNext(); });
+  }
+
+  document.getElementById('playAll').addEventListener('click', ()=>{
+    if(!synth){ setStatus('当前浏览器不支持语音朗读'); return; }
+    queue = blocks; qi = 0; playingAll = true;
+    setStatus('准备开始全文朗读…');
+    playNext();
+  });
+  document.getElementById('pauseBtn').addEventListener('click', ()=>{
+    if(synth && synth.speaking){ synth.pause(); setStatus('⏸ 已暂停'); }
+  });
+  document.getElementById('resumeBtn').addEventListener('click', ()=>{
+    if(synth && synth.paused){ synth.resume(); setStatus('▶ 继续朗读'); }
+  });
+  document.getElementById('stopBtn').addEventListener('click', ()=>{
+    playingAll = false; qi = 0;
+    if(synth) synth.cancel();
+    clearPlaying(); setStatus('⏹ 已停止');
+  });
+
+  rateSel.addEventListener('change', ()=>{
+    // 若正在朗读，重新以新语速读当前句不影响已排队；仅提示下次生效
+    setStatus('语速已改为「'+rateSel.options[rateSel.selectedIndex].text+'」，下一段生效');
+  });
+
+  // 阅读进度条
+  window.addEventListener('scroll', ()=>{
+    const h = document.documentElement;
+    const p = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
+    document.getElementById('bar').style.width = (isNaN(p)?0:p)+'%';
+  });
+})();
+</script>
+</body>
+</html>
