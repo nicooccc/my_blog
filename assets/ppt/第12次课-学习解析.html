@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第12次课 学习解析 · 程序执行、数据通路与流水线</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --panel:#ffffff; --ink:#1f2430; --muted:#5b6472;
+    --line:#e3e7ed; --brand:#2b5fa8; --brand-soft:#eaf1fb;
+    --accent:#b23a2b; --accent-soft:#fbeceb; --green:#1f7a4d; --green-soft:#e8f5ee;
+    --amber:#8a6100; --amber-soft:#fdf4dc; --code:#f2f4f7;
+    --shadow:0 1px 3px rgba(20,30,50,.06),0 8px 24px rgba(20,30,50,.04);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    font-size:15.5px;line-height:1.75;}
+  a{color:var(--brand);text-decoration:none}
+  code,.mono{font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;font-size:.92em}
+
+  /* layout */
+  .wrap{display:flex;max-width:1180px;margin:0 auto;gap:28px;padding:0 22px}
+  nav{width:236px;flex:0 0 236px;position:sticky;top:0;height:100vh;overflow:auto;padding:26px 6px 60px 0}
+  nav h3{font-size:12px;letter-spacing:.14em;color:var(--muted);margin:0 0 10px;padding-left:12px;text-transform:uppercase}
+  nav a{display:block;color:var(--muted);padding:5px 12px;border-radius:8px;font-size:13.5px;line-height:1.4;border-left:2px solid transparent}
+  nav a:hover{background:var(--brand-soft);color:var(--brand)}
+  nav a.sub{padding-left:24px;font-size:12.8px;color:#8a93a2}
+  nav .grp{margin-bottom:14px}
+  main{flex:1;min-width:0;padding:34px 0 90px}
+
+  /* header */
+  .hero{background:linear-gradient(135deg,#2b5fa8,#1d4478);color:#fff;border-radius:16px;padding:34px 34px 30px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .hero:after{content:"";position:absolute;right:-60px;top:-70px;width:240px;height:240px;border-radius:50%;background:rgba(255,255,255,.07)}
+  .hero .kicker{font-size:12.5px;letter-spacing:.18em;opacity:.85}
+  .hero h1{margin:8px 0 6px;font-size:27px;line-height:1.35}
+  .hero p{margin:0;opacity:.9;font-size:14px;max-width:640px}
+  .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+  .meta span{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.2);padding:4px 11px;border-radius:20px;font-size:12px}
+
+  /* sections */
+  section{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:26px 30px;margin-top:22px;box-shadow:var(--shadow)}
+  .part-tag{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.05em;color:#fff;background:var(--brand);padding:3px 12px;border-radius:6px;margin-bottom:4px}
+  .part-tag.g{background:var(--green)} .part-tag.a{background:var(--accent)} .part-tag.m{background:#6b46a8}
+  h2{font-size:21px;margin:10px 0 4px;line-height:1.4}
+  h3{font-size:16.5px;margin:26px 0 8px;padding-left:11px;border-left:3px solid var(--brand)}
+  h4{font-size:14.5px;margin:18px 0 6px;color:var(--brand)}
+  p{margin:8px 0}
+  ul,ol{margin:8px 0;padding-left:22px}
+  li{margin:5px 0}
+  .lead{color:var(--muted);font-size:14px;margin-top:2px}
+
+  /* callouts */
+  .box{border-radius:10px;padding:14px 18px;margin:14px 0;border:1px solid;font-size:14.5px}
+  .box .t{font-weight:700;display:block;margin-bottom:4px}
+  .key{background:var(--brand-soft);border-color:#cfe0f6;color:#1c3f70}
+  .warn{background:var(--accent-soft);border-color:#f3d2ce;color:#8a2e22}
+  .tip{background:var(--green-soft);border-color:#c9e8d6;color:#175c3a}
+  .note{background:var(--amber-soft);border-color:#f0e2b8;color:#7a5600}
+
+  /* table */
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+  th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+  th{background:#f0f3f8;font-weight:600;color:#2a3342}
+  tr:nth-child(even) td{background:#fafbfd}
+  td code{background:var(--code);padding:1px 5px;border-radius:4px}
+
+  /* formula */
+  .formula{background:var(--code);border:1px dashed #cfd6e0;border-radius:8px;padding:10px 16px;margin:10px 0;font-family:"SFMono-Regular",Consolas,monospace;font-size:14px;color:#243247;overflow-x:auto}
+  .formula b{color:var(--accent)}
+
+  /* flow */
+  .flow{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:14px 0}
+  .flow .n{background:var(--brand-soft);border:1px solid #cfe0f6;color:#1c3f70;border-radius:8px;padding:7px 12px;font-size:13px;font-weight:600}
+  .flow .ar{color:#9aa4b2;font-weight:700}
+
+  /* quiz */
+  .quiz{border:1px solid var(--line);border-radius:12px;margin:16px 0;overflow:hidden}
+  .quiz .q{padding:14px 18px;background:#f7f9fc;font-weight:600;font-size:14.5px;border-bottom:1px solid var(--line)}
+  .quiz .opts{padding:12px 18px 4px}
+  .quiz .opts div{padding:3px 0;font-size:14px;color:#3c4553}
+  .quiz .ans{padding:12px 18px 16px;font-size:14px}
+  .badge{display:inline-block;background:var(--green);color:#fff;font-size:12px;font-weight:700;padding:2px 10px;border-radius:20px;margin-right:8px}
+  .badge.x{background:var(--accent)}
+  .exp{background:var(--green-soft);border-left:3px solid var(--green);padding:10px 14px;border-radius:0 8px 8px 0;margin-top:10px;color:#175c3a;font-size:13.8px}
+
+  .两级 .n.true, .正确{color:var(--green)}
+  .steps{counter-reset:s;list-style:none;padding-left:0}
+  .steps li{position:relative;padding-left:34px;margin:9px 0;counter-increment:s}
+  .steps li:before{content:counter(s);position:absolute;left:0;top:1px;width:22px;height:22px;background:var(--brand);color:#fff;border-radius:50%;font-size:12px;display:flex;align-items:center;justify-content:center;font-weight:700}
+  .divider{height:1px;background:var(--line);margin:26px 0}
+  footer{text-align:center;color:var(--muted);font-size:12.5px;padding:20px}
+
+  @media(max-width:860px){
+    nav{display:none}
+    .wrap{padding:0 14px}
+    section{padding:20px 18px}
+    .hero{padding:26px 22px}
+    .hero h1{font-size:22px}
+  }
+  @media print{
+    nav{display:none} body{background:#fff;font-size:12px}
+    .wrap{max-width:none;padding:0} section{box-shadow:none;break-inside:avoid;margin-top:14px}
+    .hero{background:#2b5fa8 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<nav>
+  <h3>目录</h3>
+  <div class="grp">
+    <a href="#overview">概览 · 知识地图</a>
+  </div>
+  <div class="grp">
+    <a href="#p1">第一部分 · 程序执行概述</a>
+    <a class="sub" href="#p1-1">程序与指令的关系</a>
+    <a class="sub" href="#p1-2">CPU 的三种周期</a>
+    <a class="sub" href="#p1-3">指令执行基本过程</a>
+    <a class="sub" href="#p1-4">机器指令执行举例（溢出）</a>
+    <a class="sub" href="#p1-5">异常与中断</a>
+    <a class="sub" href="#p1-6">本部分小结 · 投票题</a>
+  </div>
+  <div class="grp">
+    <a href="#p2">第二部分 · 数据通路</a>
+    <a class="sub" href="#p2-1">冯·诺依曼结构</a>
+    <a class="sub" href="#p2-2">数据通路与控制器</a>
+    <a class="sub" href="#p2-3">两类逻辑元件</a>
+    <a class="sub" href="#p2-4">时序控制与 D 触发器</a>
+    <a class="sub" href="#p2-5">总线式数据通路</a>
+    <a class="sub" href="#p2-6">本部分小结 · 投票题</a>
+  </div>
+  <div class="grp">
+    <a href="#p3">第三部分 · 指令流水线</a>
+    <a class="sub" href="#p3-1">洗衣例子：流水线直觉</a>
+    <a class="sub" href="#p3-2">五段流水线 IF~WB</a>
+    <a class="sub" href="#p3-3">单周期 vs 流水线</a>
+    <a class="sub" href="#p3-4">练习：插入流水段寄存器</a>
+    <a class="sub" href="#p3-5">讨论题</a>
+    <a class="sub" href="#p3-6">冲突与冒险 Hazard</a>
+    <a class="sub" href="#p3-7">GPU / ARM 流水线</a>
+    <a class="sub" href="#p3-8">本部分小结 · 投票题</a>
+  </div>
+  <div class="grp">
+    <a href="#p4">第四部分 · 指令系统</a>
+    <a class="sub" href="#p4-1">流水线友好的指令特征</a>
+    <a class="sub" href="#p4-2">CISC vs RISC</a>
+    <a class="sub" href="#p4-3">RISC-V 与国产处理器</a>
+    <a class="sub" href="#p4-4">本部分小结 · 投票题</a>
+  </div>
+  <div class="grp">
+    <a href="#cheat">核心速记表</a>
+  </div>
+</nav>
+
+<main>
+
+<div class="hero">
+  <div class="kicker">计算机系统基础 · 第五章 程序的执行</div>
+  <h1>第 12 次课 学习解析</h1>
+  <p>程序执行概述与数据通路 · 流水线方式下指令的执行与指令系统 —— 把 70 页课件压缩成一份可复习、可推导、可对答案的讲义。</p>
+  <div class="meta">
+    <span>覆盖 70 页课件</span>
+    <span>4 大主题</span>
+    <span>7 道投票题 · 逐题解析</span>
+    <span>6 道计算题 · 完整推导</span>
+  </div>
+</div>
+
+<!-- ============ OVERVIEW ============ -->
+<section id="overview">
+  <span class="part-tag">知识地图</span>
+  <h2>这节课到底在讲什么？</h2>
+  <p class="lead">一句话主线：<b>CPU 就是不停地“取指—执行”，而这条指令能跑起来，靠的是“数据通路”这条硬件通道；为了让多条指令重叠跑得更快，就引入了“流水线”。</b></p>
+
+  <div class="flow">
+    <span class="n">程序执行概述</span><span class="ar">→</span>
+    <span class="n">数据通路（硬件通道）</span><span class="ar">→</span>
+    <span class="n">流水线（重叠执行）</span><span class="ar">→</span>
+    <span class="n">指令系统（ISA 设计）</span>
+  </div>
+
+  <table>
+    <tr><th>部分</th><th>对应课件页</th><th>核心问题</th><th>高频考点</th></tr>
+    <tr><td>一、程序执行概述</td><td>1–18</td><td>CPU 如何一条条执行指令？</td><td>三种周期、PC、取指—译码—取数—执行—回写、溢出、异常/中断</td></tr>
+    <tr><td>二、数据通路</td><td>19–36</td><td>数据在硬件里走哪条路、何时走？</td><td>组合/时序逻辑、建立/保持时间、时钟周期公式、单/三总线</td></tr>
+    <tr><td>三、指令流水线</td><td>37–56</td><td>如何让多条指令重叠执行？</td><td>五段流水、吞吐率/延时计算、插入寄存器、三类冒险</td></tr>
+    <tr><td>四、指令系统</td><td>57–70</td><td>什么样的 ISA 适合流水线？</td><td>流水线友好特征、CISC vs RISC、RISC-V</td></tr>
+  </table>
+
+  <div class="box key">
+    <span class="t">贯穿全课的三个核心公式</span>
+    ① 时钟周期 = Clk-to-Q + 最长组合逻辑延迟 + 建立时间 + 时钟偏移（第 26 页）<br>
+    ② 流水线时钟周期 = 最长流水段的组合逻辑延迟 + 流水段寄存器延迟<br>
+    ③ 吞吐率 = 1 / 时钟周期；一条指令的流水线执行时间 = 段数 × 时钟周期
+  </div>
+</section>
+
+<!-- ============ PART 1 ============ -->
+<section id="p1">
+  <span class="part-tag">第一部分</span>
+  <h2>程序执行概述（课件 1–18 页）</h2>
+  <p class="lead">关键词：程序 = 指令序列；CPU = 周而复始取指执行；PC 控制执行流；周期分层；异常与中断打断正常流。</p>
+
+  <h3 id="p1-1">1. 程序与指令的关系（第 4 页）</h3>
+  <ul>
+    <li><b>程序由一条条指令组成</b>，指令按顺序存放在连续的存储单元中。</li>
+    <li>程序的执行就是<b>周而复始地执行一条条指令</b>。正常情况下按存放顺序执行；遇到转移类指令（无条件转移、条件转移、调用、返回）时改变执行流。</li>
+    <li><b>程序计数器 PC</b> 保存“将要执行的指令”的地址，<b>改变 PC 就等于改变执行顺序</b>：</li>
+  </ul>
+  <div class="flow">
+    <span class="n">顺序执行</span><span class="ar">→</span><span class="n">PC = PC + “1”</span>
+    <span style="margin:0 8px">或</span>
+    <span class="n">转移/调用</span><span class="ar">→</span><span class="n">直接给 PC 赋值</span>
+  </div>
+  <div class="box note">
+    <span class="t">引号的“1”是关键</span>
+    PC + “1” 中的 <code>“1”</code> 不是数字 1，而是<b>一条指令的长度</b>：MIPS 等定长 32 位指令是 PC+4；x86 变长指令则是 PC+“当前指令字节数”。这是第 18 页投票题的考点。
+  </div>
+
+  <h3 id="p1-2">2. CPU 的三种周期（第 5 页）</h3>
+  <table>
+    <tr><th>周期</th><th>定义</th><th>层级关系</th></tr>
+    <tr><td>指令周期</td><td>取出<b>并执行</b>一条指令的时间；不同指令的指令周期可能不同</td><td>最大</td></tr>
+    <tr><td>机器周期（CPU 周期 / 取指周期）</td><td>完成一个基本操作（如取出一条指令）所需时间</td><td>中</td></tr>
+    <tr><td>时钟周期（振荡周期）</td><td>时钟频率的倒数，计算机中最基本、最小的时间单位；一个时钟周期只完成一个最基本动作</td><td>最小</td></tr>
+  </table>
+  <div class="formula">时钟周期 ≤ 机器周期 ≤ 指令周期</div>
+  <div class="box tip">
+    <span class="t">现代计算机的例外（第 69 页）</span>
+    早期计算机有明确的“机器周期”；<b>现代计算机已基本没有机器周期的概念</b>，一个指令周期直接由若干个时钟周期（节拍）组成。这也是第 17 页题的背景。
+  </div>
+
+  <h3 id="p1-3">3. 一条指令的执行过程（第 7、8 页）</h3>
+  <p>CPU 运行程序 = 执行一条条指令。每条指令的功能都由以下基本操作组合实现：</p>
+  <ol class="steps">
+    <li><b>取指</b>：从 PC 所指内存取出指令送 IR，取“最长指令字节数”。</li>
+    <li><b>译码</b>：根据不同指令译出不同控制信号。</li>
+    <li><b>取操作数</b>：根据寻址方式确定源/目的操作数地址，访存或读寄存器。</li>
+    <li><b>执行</b>：由 ALU 或加法器完成运算，计算目的地址。</li>
+    <li><b>回写</b>：把结果写回寄存器或主存。</li>
+    <li><b>修改 PC</b>：顺序则 PC + 当前指令长度，转移则把目的地址写入 PC。</li>
+  </ol>
+  <p>此外还要在指令执行中<b>查询异常</b>、在指令结束时<b>查询中断请求</b>（第 8 页）。</p>
+
+  <h3 id="p1-4">4. 机器指令执行举例：add 函数与整数溢出（第 9–13 页）</h3>
+  <p>课件给出 <code>objdump -d test</code> 反汇编的 <code>add</code> 函数，问：<b>若 i=2147483647，j=2，结果是什么？</b></p>
+  <div class="formula">080483d4 &lt;add&gt;:&nbsp; push %ebp → mov %esp,%ebp → sub $0x10,%esp<br>
+  mov 0xc(%ebp),%eax &nbsp; <span style="color:#5b6472"># eax = j = 2</span><br>
+  mov 0x8(%ebp),%edx &nbsp;&nbsp; <span style="color:#5b6472"># edx = i = 0x7fffffff</span><br>
+  <b>lea (%edx,%eax,1),%eax</b> &nbsp; <span style="color:#5b6472"># eax = edx + eax×1</span></div>
+  <p><code>lea (%edx,%eax,1), %eax</code> 功能为 <code>R[eax] ← R[edx] + R[eax]×1</code>。代入数值（课件第 13 页图中 ALU 输入正是 7fffffff 与 2）：</p>
+  <div class="formula">0x7fffffff + 0x2 = <b>0x80000001</b></div>
+  <div class="box warn">
+    <span class="t">结果：有符号溢出</span>
+    2147483647 是 32 位有符号整数最大值（0x7FFFFFFF）。加 2 后超出范围，按补码回绕成 <b>0x80000001，即 −2147483647</b>。这就是课件让算 this 例子的目的——<b>演示 ALU 运算中溢出的硬件表现</b>，也呼应第 14 页“ALU 运算结果发生溢出”属于异常。
+  </div>
+  <p class="lead">课件第 10–11 页还逐步画出 <code>push %ebp</code> 的取指/译码/执行三阶段，展示了 PC→MAR→读内存→MDR→IR、ESP 减 4、写回等信号与寄存器变化，是理解“数据通路”的预备动画。</p>
+
+  <h3 id="p1-5">5. 打断程序正常执行的事件（第 14、15 页）</h3>
+  <p>正常执行时，CPU 上电后只重复一件事：<b>读出 PC 所指指令并执行</b>。以下事件会打断它：</p>
+  <table>
+    <tr><th>类别</th><th>来源</th><th>典型例子</th></tr>
+    <tr><td>内部异常</td><td>CPU 内部</td><td>非法操作码、段错误/缺页、ALU 溢出、除数为 0、断点、单步跟踪；硬故障中断（硬件线路异常）</td></tr>
+    <tr><td>外部中断（I/O 中断）</td><td>CPU 外部 I/O 子系统</td><td>采样计时到、网络包到达、磁盘读写完成</td></tr>
+  </table>
+  <ul>
+    <li>CPU 必须具备打断时的处理机制，称为<b>异常控制 / 中断机制</b>，相应处理逻辑叫<b>中断机构</b>。</li>
+    <li>外部中断的处理：<b>每条指令执行完 CPU 主动查询中断请求</b> → 有则把下条指令作为<b>断点</b>保存 → 转去执行“中断服务程序” → 结束后返回断点继续。这类事件与当前指令无关。</li>
+  </ul>
+
+  <h3 id="p1-6">6. 本部分小结 · 投票题解析</h3>
+  <div class="box key"><span class="t">小结（第 16 页）</span>各种周期的概念 · 程序及指令的执行过程 · 机器指令执行举例 · 打断程序正常运行的事件。</div>
+
+  <div class="quiz">
+    <div class="q">【第 17 页】CPU 取出一条指令并执行所用的时间被称为（&nbsp;&nbsp;）</div>
+    <div class="opts"><div>A. 时钟周期　　B. CPU 周期　　C. 机器周期　　D. 指令周期</div></div>
+    <div class="ans"><span class="badge">答案 D</span>
+      <div class="exp">“取出<b>并执行</b>一条指令所用的时间”正是指令周期的定义。一个指令周期可分为取指、读操作数、执行并写结果等多个机器周期，而每个机器周期又由若干时钟周期组成。CPU 周期一般就等于机器周期。</div>
+    </div>
+  </div>
+
+  <div class="quiz">
+    <div class="q">【第 18 页】下列有关程序计数器 PC 的叙述中，错误的是（&nbsp;&nbsp;）</div>
+    <div class="opts">
+      <div>A. 每条指令执行后，PC 的值都会被改变</div>
+      <div>B. 每条指令顺序执行时，PC 的值总是自动加 1</div>
+      <div>C. 调用指令执行后，PC 的值一定是被调用过程的入口地址</div>
+      <div>D. 无条件转移指令执行后，PC 的值一定是被调用过程的入口地址</div>
+    </div>
+    <div class="ans"><span class="badge">答案 D</span>
+      <div class="exp">课件解析区专门解释了 B：“顺序执行时 PC 总是自动加<b>当前指令的长度</b>，通常所说 PC+‘1’ 的 1 加了引号，指的就是一条指令长度”——所以 B 被认为是正确表述。而 <b>D 混淆了转移与调用</b>：无条件转移（jmp）执行后 PC 是<b>转移的目标地址</b>，不一定是“被调用过程的入口地址”；后者是<b>调用指令（call）</b>的结果（对应 C，正确）。故错误的是 D。</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PART 2 ============ -->
+<section id="p2">
+  <span class="part-tag g">第二部分</span>
+  <h2>数据通路（课件 19–36 页）</h2>
+  <p class="lead">关键词：指令的执行部件；由组合逻辑 + 时序逻辑经总线/分散方式连接；“何时写入”由时序控制决定；时钟周期由最慢路径决定。</p>
+
+  <h3 id="p2-1">1. 从冯·诺依曼结构说起（第 20 页）</h3>
+  <p>五大部件：输入设备、输出设备、存储器、运算器、控制器。早期部件间用<b>分散方式</b>相连；现在大多用<b>总线方式</b>；趋势是<b>点对点高速连接</b>。</p>
+  <div class="box note"><span class="t">辨析</span>系统总线按传输内容分三类：<b>数据线、地址线、控制线</b>。控制器与存储器/运算器之间交换“控制信号与状态”。</div>
+
+  <h3 id="p2-2">2. 什么是数据通路 / 控制器（第 21 页）</h3>
+  <table>
+    <tr><th>概念</th><th>定义</th><th>角色</th></tr>
+    <tr><td>数据通路 DataPath</td><td>指令执行过程中数据经过的路径，包含路径上的 ALU、通用寄存器、状态寄存器、cache、MMU、FPU、异常和中断处理逻辑等</td><td>指令的<b>执行部件</b></td></tr>
+    <tr><td>控制器 Control</td><td>对指令译码，生成对应的控制信号，控制数据通路的动作</td><td>指令的<b>控制部件</b></td></tr>
+  </table>
+  <p>记忆模型：CPU = DataPath（干活）+ Control（指挥），再与 Memory、Input、Output 交互。</p>
+
+  <h3 id="p2-3">3. 两类逻辑元件（第 22–24 页）</h3>
+  <table>
+    <tr><th>类型</th><th>典型元件</th><th>核心特点</th></tr>
+    <tr><td>组合逻辑元件（操作元件）</td><td>加法器 Adder、译码器 Decoder、多路选择器 MUX、ALU</td><td>输出只取决于当前输入；<b>不受时钟控制</b>；输入一样输出一样；经门延迟后改变并保持</td></tr>
+    <tr><td>时序逻辑元件（状态/存储元件）</td><td>D 触发器、寄存器、存储器</td><td><b>有存储功能</b>；输入状态在时钟控制下被写入并保持到下一时钟；输出随时可读</td></tr>
+  </table>
+  <p>元件间连接方式：<b>总线连接</b> / <b>分散（专用线）连接</b>。数据通路 = 操作元件 + 存储元件经总线或分散方式连接，完成数据的存储、处理与传送。</p>
+  <div class="box tip"><span class="t">定时方式</span>状态元件的值在时钟边沿改变：上升沿触发、下降沿触发、双边沿触发。<b>边沿触发</b>是现代寄存器最常用方式。</div>
+
+  <h3 id="p2-4">4. 时序控制与 D 触发器（第 25、26 页）</h3>
+  <p>三个关键时间参数：</p>
+  <table>
+    <tr><th>参数</th><th>含义</th></tr>
+    <tr><td>建立时间 Setup Time</td><td>触发时钟边沿<b>之前</b>，输入必须稳定的时间</td></tr>
+    <tr><td>保持时间 Hold Time</td><td>触发时钟边沿<b>之后</b>，输入必须稳定的时间</td></tr>
+    <tr><td>锁存延迟 Clock-to-Q</td><td>从触发边沿开始到输出 Q 状态改变的时间</td></tr>
+  </table>
+  <div class="formula">Cycle Time = <b>Clk-to-Q</b> + <b>最长组合逻辑延迟（Longest Delay）</b> + <b>建立时间</b> + <b>时钟偏移</b></div>
+  <p>理解：数据在时钟边沿被“发射”出来（Clk-to-Q），经过最长的一条组合逻辑路径（Longest Delay），必须在下一个时钟边沿的“建立时间”之前稳定下来，再考虑时钟到达不同寄存器的偏差（时钟偏移）。<b>这条最长路径决定了整个 CPU 能跑多快</b>——这也是流水线要切分组合逻辑的根本原因。</p>
+  <div class="box key"><span class="t">核心论断（第 26 页）</span>只有状态元件能存储信息；操作元件必须从状态元件取输入、把输出写回状态元件。其输入是前一时钟生成的数据，输出是当前时钟所用的数据。</div>
+
+  <h3 id="p2-5">5. 总线式数据通路（第 27–32 页）</h3>
+  <h4>① 早期累加型（第 27 页）</h4>
+  <p>最简单、分散连接，原型是 IAS 计算机。取指路径：<code>PC→MAR, Read M, M→MBR→IBR→IR</code>。</p>
+  <h4>② 单总线数据通路（第 28–31 页）</h4>
+  <p>四种基本操作的时序控制信号（标记为 L2，即在第 2 级/一个总线周期完成一步）：</p>
+  <table>
+    <tr><th>基本操作</th><th>控制信号序列</th><th>周期数</th></tr>
+    <tr><td>寄存器间传送</td><td><code>R0out, Yin</code></td><td>1 Cycle</td></tr>
+    <tr><td>算术逻辑运算</td><td><code>R1out, Yin</code> → <code>R2out, Add, Zin</code> → <code>Zout, R3in</code></td><td>3 Cycles</td></tr>
+    <tr><td>从主存取字</td><td><code>R1out, MARin</code> → <code>Read, WMFC</code> → <code>MDRout, R2in</code></td><td>&gt;3 Cycles</td></tr>
+    <tr><td>写字到主存</td><td><code>R1out, MARin</code> → <code>R2out, MDRin</code> → <code>Write, WMFC</code></td><td>&gt;3 Cycles</td></tr>
+  </table>
+  <div class="box note"><span class="t">WMFC = Wait for Memory Function Complete</span>早期访存用<b>异步</b>方式，靠 MFC 应答信号；现代用<b>同步</b>方式，无需应答。单总线一个时钟只能传一个数据，效率很低。</div>
+  <h4>③ 三总线数据通路（第 32 页）</h4>
+  <ul>
+    <li>总线 A、B 分别传两个源操作数，总线 C 传结果；三条总线各传不同数据不冲突，<b>因此不再需要暂存器 Y 和 Z</b>。</li>
+    <li>采用双口通用寄存器组，实现 <code>R[R3] ← R[R1] op R[R2]</code> 只需一个控制信号序列 <code>R1outA, R2outB, op, R3inC</code>，<b>一个时钟周期即可完成</b>。</li>
+  </ul>
+
+  <h3 id="p2-6">6. 本部分小结 · 投票题解析</h3>
+
+  <div class="quiz">
+    <div class="q">【第 34 页】下列有关数据通路的叙述，错误的是（&nbsp;&nbsp;）</div>
+    <div class="opts">
+      <div>A. 数据通路由若干操作元件和状态元件连接而成</div>
+      <div>B. 数据通路的功能由控制部件送出的控制信号决定</div>
+      <div>C. ALU 是数据操作元件，用于执行各类算术和逻辑运算</div>
+      <div>D. 通用寄存器属于状态元件，但不包含在数据通路中</div>
+    </div>
+    <div class="ans"><span class="badge">答案 D</span>
+      <div class="exp">课件解析区明确：“数据通路由操作元件和状态元件连接而成，<b>通用寄存器属于状态元件，包含在数据通路中</b>。”数据通路的定义（第 21 页）就包含通用寄存器。故 D 错误。A、B、C 均正确。</div>
+    </div>
+  </div>
+
+  <div class="quiz">
+    <div class="q">【第 35 页】通常情况下，下列（&nbsp;&nbsp;）部件不包含在中央处理器（CPU）芯片中。</div>
+    <div class="opts"><div>A. ALU　　B. 控制器　　C. 通用寄存器　　D. DRAM</div></div>
+    <div class="ans"><span class="badge">答案 D</span>
+      <div class="exp">ALU、控制器、通用寄存器都在 CPU 芯片内；<b>DRAM（动态随机存取存储器）属于主存</b>，通常不在 CPU 芯片中（CPU 内的是 cache，一般由 SRAM 构成）。故选 D。</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PART 3 ============ -->
+<section id="p3">
+  <span class="part-tag a">第三部分</span>
+  <h2>指令流水线（课件 37–56 页）</h2>
+  <p class="lead">关键词：让多条指令重叠执行以提高吞吐率；时钟周期由最长流水段决定；段数越多吞吐率越高但单条指令延时也变长；三类冒险会打断流水。</p>
+
+  <h3 id="p3-1">1. 洗衣例子：流水线的直觉（第 39–41 页）</h3>
+  <p>4 人各洗一批衣服，每批要经过洗 30 min → 烘 40 min → 叠 20 min 三步。</p>
+  <table>
+    <tr><th>方式</th><th>总时间（N 批）</th><th>4 批时</th></tr>
+    <tr><td>串行</td><td>N × (30+40+20) = 90N 分钟</td><td>360 min = 6 小时</td></tr>
+    <tr><td>流水线（尽快开始）</td><td>30 + N×40 + 20 分钟</td><td>30 + 160 + 20 = 210 min = 3.5 小时</td></tr>
+  </table>
+  <div class="box tip"><span class="t">结论</span>流水线方式所用时间<b>主要与最长阶段的时间有关</b>（此处烘干 40 min）。假定每步时间均衡，比串行提高约 3 倍。这就是“Pipelining: It's Natural!”。</div>
+
+  <h3 id="p3-2">2. 五段流水线 IF–WB（第 42 页）</h3>
+  <div class="flow">
+    <span class="n">IF 取指令<br><small>按 PC 从存储器取指令</small></span><span class="ar">→</span>
+    <span class="n">ID 指令译码<br><small>产生控制信号</small></span><span class="ar">→</span>
+    <span class="n">OF 取操作数<br><small>读存储器/寄存器操作数</small></span><span class="ar">→</span>
+    <span class="n">EX 执行<br><small>对操作数完成指定操作</small></span><span class="ar">→</span>
+    <span class="n">WB 写回<br><small>结果写存储器/寄存器</small></span>
+  </div>
+
+  <h3 id="p3-3">3. 单周期 vs 流水线（第 43、44 页）</h3>
+  <p>设最复杂指令的五步耗时：取指 200ps、译码+读操作数 50ps、ALU 100ps、读存储器 200ps、写寄存器 50ps。</p>
+  <table>
+    <tr><th>指标</th><th>单周期数据通路</th><th>流水线数据通路</th></tr>
+    <tr><td>时钟周期</td><td>200+50+100+200+50 = <b>600 ps</b>（由最复杂指令决定）</td><td>最长段 200ps + 段寄存器 50ps = <b>250 ps</b></td></tr>
+    <tr><td>CPI</td><td>1</td><td>理想情况下 ≈ 1（稳态每周期流出一条）</td></tr>
+    <tr><td>一条指令执行时间（延时）</td><td><b>600 ps</b></td><td>250×5 = <b>1.25 ns</b>（反而更长）</td></tr>
+    <tr><td>吞吐率</td><td>1/600ps ≈ <b>1.67 GIPS</b></td><td>1/250ps = <b>4 GIPS</b></td></tr>
+  </table>
+  <div class="box key">
+    <span class="t">流水线的重要权衡（易考）</span>
+    流水线<b>提高了吞吐率</b>（单位时间完成的指令数变多），但<b>单条指令的延时可能变长</b>（因为加入了段寄存器开销，且要等满 5 段）。程序总执行时间 = 指令条数 ÷ 吞吐率，所以整体更快。
+  </div>
+
+  <h3 id="p3-4">4. 练习：插入流水段寄存器（第 45–49 页）</h3>
+  <p class="lead">题干：6 个功能段 A~F 的组合逻辑延迟依次为 <b>80 / 30 / 60 / 50 / 60 / 20 ps</b>，最后一段需写寄存器，<b>流水段寄存器延时 20 ps</b>。求不同切分下的时钟周期、吞吐率、每条指令执行时间，以及寄存器插在哪里。</p>
+  <table>
+    <tr><th>方案</th><th>寄存器插入位置</th><th>各段组合逻辑延迟(ps)</th><th>时钟周期</th><th>吞吐率</th><th>指令执行时间</th></tr>
+    <tr><td>(1) 2 级</td><td>C 与 D 之间（平衡点）</td><td>80+30+60=170；50+60+20=130</td><td>170+20=<b>190ps</b></td><td>1/190≈<b>5.26 G</b></td><td>2×190=<b>380ps</b></td></tr>
+    <tr><td>(2) 3 级</td><td>B–C、D–E 之间</td><td>110；110；80</td><td>110+20=<b>130ps</b></td><td>1/130≈<b>7.69 G</b></td><td>3×130=<b>390ps</b></td></tr>
+    <tr><td>(3) 4 级</td><td>A–B、C–D、D–E 之间</td><td>80；90(30+60)；50；80(60+20)</td><td>90+20=<b>110ps</b></td><td>1/110≈<b>9.09 G</b></td><td>4×110=<b>440ps</b></td></tr>
+    <tr><td>(4) 5 级（吞吐率最大）</td><td>A–B、B–C、C–D、D–E 之间</td><td>80；30；60；50；80(60+20)</td><td>80+20=<b>100ps</b></td><td>1/100=<b>10 G</b></td><td>5×100=<b>500ps</b></td></tr>
+  </table>
+  <div class="box warn">
+    <span class="t">规律总结（第 49 页汇总）</span>
+    流水段越多 → 每段越短 → 时钟周期越短 → <b>吞吐率越高</b>（5.26 → 7.69 → 9.09 → 10 G）；但<b>单条指令执行时间反而变长</b>（380 → 390 → 440 → 500 ps），因为段寄存器开销在累积。这是设计流水线时的基本矛盾。
+  </div>
+  <div class="box note"><span class="t">做题方法</span>① 先决定切几段、在哪切；② 把每段内的组合逻辑延迟相加，取<b>最大值</b>作为最长段；③ 时钟周期 = 最长段 + 寄存器延时；④ 吞吐率 = 1/时钟周期；⑤ 指令执行时间 = 段数 × 时钟周期。想吞吐率最大，就尽量让每段延迟接近最长段（80ps）。</div>
+
+  <h3 id="p3-5">5. 讨论题（第 50 页）</h3>
+  <p class="lead">条件：五级流水 —— 取指 200ps、译码+读操作数 50ps、ALU 150ps、读存储器 200ps、写寄存器 50ps，<b>段寄存器延时 50ps</b>。</p>
+  <p><b>基准</b>：最长段 200ps，时钟周期 = 200+50 = <b>250ps</b>；吞吐率 4 GIPS；指令延时 5×250 = 1250ps。</p>
+  <ol class="steps">
+    <li><b>段寄存器（额外开销）的影响</b>：若忽略寄存器延时，时钟周期 200ps、吞吐率 5G、延时 1000ps；计入 50ps 后，周期升到 250ps（+25%），吞吐率降到 4G（−20%），延时升到 1250ps（+25%）。<b>段寄存器开销会降低性能</b>。</li>
+    <li><b>取指时间缩短 20%</b>：200→160ps，最长段仍是“读存储器 200ps”。<b>时钟周期不变（250ps），吞吐率与执行时间都不变</b>——因为取指不是瓶颈段。</li>
+    <li><b>ALU 时间延长</b>：<br>
+      · 延长 20%：150→180ps，仍小于 200ps，<b>最长段不变</b> → 周期 250ps、吞吐率 4G、延时 1250ps，均不变。<br>
+      · 延长 40%：150→210ps，<b>超过 200ps 成为新瓶颈</b> → 周期 = 210+50 = <b>260ps</b>，吞吐率 1/260≈<b>3.85 GIPS</b>，延时 5×260=<b>1300ps</b>。<br>
+      <span class="lead">要点：<b>只有改变最长段（瓶颈）才会影响时钟周期和吞吐率</b>；非瓶颈段的小幅变化被“淹没”。</span>
+    </li>
+  </ol>
+
+  <h3 id="p3-6">6. 流水线的冲突 / 冒险 Hazard（第 51 页）</h3>
+  <p>Hazard：流水线遇到无法正确执行后续指令，或执行了不该执行的指令。课件注明“本部分只需大概了解”。</p>
+  <table>
+    <tr><th>类型</th><th>现象</th><th>解决办法</th></tr>
+    <tr><td>结构冒险<br><small>硬件资源冲突</small></td><td>同一部件同时被不同指令使用</td><td>增加部件：如<b>指令存储器 IM 与数据存储器 DM 分开</b></td></tr>
+    <tr><td>数据冒险<br><small>数据相关</small></td><td>后面指令要用的结果，前面指令还没产生</td><td><b>转发/旁路 Forwarding/Bypassing</b>、前半周期读后半周期写；<b>Load-use 冒险不能靠转发，需阻塞(stall)一周期</b>；编译优化指令顺序</td></tr>
+    <tr><td>控制冒险<br><small>改变控制流</small></td><td>转移或异常改变流程，后继指令在目标地址产生前已被取出</td><td>静态/动态<b>分支预测</b>；编译优化（分支延迟）</td></tr>
+  </table>
+
+  <h3 id="p3-7">7. GPU 与 ARMv8 流水线（第 52、53 页）</h3>
+  <ul>
+    <li><b>GPU 流水线</b>：专注大规模并行（图形渲染）。顶点处理 → 几何处理（可选）→ 光栅化 → 像素处理。每个顶点/像素可独立处理，高度并行。</li>
+    <li><b>ARMv8</b>：Cortex-A53 有序八级流水，A57 乱序 15+ 级。关键技术：超标量（一周期发射多条）、分支预测、投机执行、高级乱序执行——都是为减少流水线停顿、提高吞吐率。</li>
+  </ul>
+
+  <h3 id="p3-8">8. 本部分小结 · 投票题解析</h3>
+  <div class="box key"><span class="t">小结（第 54 页）</span>流水线时钟周期由最长流水段决定 · 流水线的吞吐率 · 流水线指令的执行时间。</div>
+
+  <div class="quiz">
+    <div class="q">【第 55 页】某计算机指令流水线由 4 个功能段组成，各段流经时间为 90ns、80ns、70ns、60ns（忽略段寄存器缓存时间），则 CPU 时钟周期至少是（&nbsp;&nbsp;）</div>
+    <div class="opts"><div>A. 90ns　　B. 80ns　　C. 70ns　　D. 60ns</div></div>
+    <div class="ans"><span class="badge">答案 A</span>
+      <div class="exp">流水线时钟周期由<b>最长的流水段</b>决定，与段寄存器缓存时间无关（题目已说明忽略）。最长段为 90ns，故时钟周期至少 90ns。</div>
+    </div>
+  </div>
+
+  <div class="quiz">
+    <div class="q">【第 56 页】6 个子功能 A~F 分别耗时 80/40/50/70/20/30 ps，段寄存器延时 20ps。把 E、F 合并构成 5 段流水线，其时钟周期至少是（&nbsp;&nbsp;）</div>
+    <div class="opts"><div>A. 70ps　　B. 80ps　　C. 90ps　　D. 100ps <span style="color:#9aa">(课件选项单位误写为 ns)</span></div></div>
+    <div class="ans"><span class="badge">答案 D</span>
+      <div class="exp">合并 E、F 后各段为：A=80、B=40、C=50、D=70、EF=20+30=50 ps。最长段是 A 段 80ps。时钟周期 = 最长段 + 段寄存器延时 = 80+20 = <b>100ps</b>，选 D。</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PART 4 ============ -->
+<section id="p4">
+  <span class="part-tag m">第四部分</span>
+  <h2>指令系统（课件 57–68 页）</h2>
+  <p class="lead">关键词：规整、简单、一致的指令集有利于流水线；CISC 复杂庞大，RISC 精简规整；RISC-V 开源模块化。</p>
+
+  <h3 id="p4-1">1. 流水线友好的指令集特征（第 58 页）</h3>
+  <ul>
+    <li><b>指令长度尽量一致</b>——简化取指与译码。MIPS 定长 32 位，下址计算方便（PC+4）；x86 长度 1~17 字节不等，取指部件极其复杂。</li>
+    <li><b>格式少、源寄存器位置相同</b>——指令未知时就能取操作数。MIPS 的 rs、rt 位置固定，译码时即可读出；若位置随指令变化，须先判明类型才能取寄存器编号。</li>
+    <li><b>只有 load/store 指令访存</b>——减少操作步骤、规整流水线。MIPS 的 lw/sw 地址计算与运算指令步骤规整在同一周期；x86 运算类指令操作数可为内存数据，需额外算地址、访存、执行。</li>
+    <li><b>内存中对齐存放</b>——减少访存次数，利于流水线规整。</li>
+  </ul>
+  <div class="box key"><span class="t">一句话</span>规整、简单、一致（规整性）等特性有利于指令的流水线执行。</div>
+  <p class="lead">MIPS R 型指令格式（第 58 页）：<code>op(6) | rs(5) | rt(5) | rd(5) | shamt(5) | func(6)</code>，共 32 位。</p>
+
+  <h3 id="p4-2">2. CISC 与 RISC（第 59–62 页）</h3>
+  <table>
+    <tr><th>对比项</th><th>CISC（复杂指令集）</th><th>RISC（精简指令集）</th></tr>
+    <tr><td>指令系统</td><td>指令多、寻址方式多、格式多、变长操作码/指令字</td><td>指令少、寻址方式少、格式少、<b>指令长度一致</b></td></tr>
+    <tr><td>访存方式</td><td>各种指令都能访存（含运算指令），指令周期差距大</td><td><b>RR 方式</b>：除 Load/Store 外都只访问寄存器</td></tr>
+    <tr><td>指令周期</td><td>长，多数指令需多个时钟周期</td><td>短，流水线工作，简单指令一个周期甚至不到</td></tr>
+    <tr><td>控制器</td><td>指令太复杂无法硬连线，只能用慢速微程序控制器</td><td><b>硬连线控制器</b>，不用或少用微程序</td></tr>
+    <tr><td>其他</td><td>难编译优化；研制周期长、难调试维护（如 VAX-11/780：16 种寻址、303 条指令）</td><td>大量通用寄存器减少访存；优化编译系统支持高级语言</td></tr>
+  </table>
+  <div class="box tip">
+    <span class="t">著名的 20%–80% 规律（第 60 页）</span>
+    对 CISC 测试发现：程序中<b>最常使用的简单指令占 80%，但只占指令系统的 20%</b>；而占指令总数 20% 的复杂指令却占用了控制存储器容量的 80%。这正是 RISC 的思想来源。1975 年 IBM 的 John Cocke 提出 RISC；1982 年第一代 RISC 机问世（伯克利 RISC-I、斯坦福 MIPS、IBM 801）。
+  </div>
+  <p><b>80x86 Top 10 指令</b>（第 61 页）：MOV M→R、Jcc、CMP、MOV R→M 等——简单指令占主要部分、使用频率高。</p>
+  <p class="lead">现状：MIPS 是典型 RISC，1982 年以来新指令集大多采用 RISC 体系结构；x86 因兼容需要保留 CISC 风格，但内部也借鉴了 RISC 思想。</p>
+
+  <h3 id="p4-3">3. RISC-V 与国产处理器（第 63–65 页）</h3>
+  <ul>
+    <li><b>RISC-V</b>：第五代精简指令集，2010 年起源于加州伯克利；<b>开源、免版税</b>；采用模块化指令子集和可配置寄存器；有高性能与低功耗多版本；支持 32 位和 64 位。</li>
+    <li><b>国产 RISC-V</b>：2019.7 阿里平头哥发布玄铁 910；2019.8 兆易创新发布全球首个基于 RISC-V 内核的 32 位通用 MCU；腾讯、字节、百度、海思、紫光、华米、中兴等均参与。</li>
+    <li><b>LoongArch 龙架构</b>：国产自主指令系统（课件第 65 页）。</li>
+  </ul>
+
+  <h3 id="p4-4">4. 本部分小结 · 投票题解析</h3>
+
+  <div class="quiz">
+    <div class="q">【第 67 页】下列有关 RISC 特征的描述中，错误的是（&nbsp;&nbsp;）</div>
+    <div class="opts">
+      <div>A. 指令格式规整，寻址方式少</div>
+      <div>B. 采用硬连线控制和指令流水线</div>
+      <div>C. 配置的通用寄存器数目不多</div>
+      <div>D. 运算类指令的操作数不访存</div>
+    </div>
+    <div class="ans"><span class="badge">答案 C</span>
+      <div class="exp">RISC 特点之一是<b>采用大量通用寄存器，以减少访存次数</b>（第 62 页）。所以“配置的通用寄存器数目不多”错误。A（规整、寻址少）、B（硬连线+流水线）、D（RR 方式、运算不访存）都是 RISC 的正确特征。</div>
+    </div>
+  </div>
+  <div class="box key"><span class="t">本章小结（第 69、70 页）</span>
+    CPU 的基本功能是周而复始执行指令并处理异常/中断；CPU 最基本的部分是<b>数据通路 + 控制单元</b>。指令执行主要包括取指、译码、取数、运算、存结果。现代计算机一个指令周期直接由时钟周期组成；数据通路早期用总线方式（单/二/三总线），现代采用流水线方式；流水线冒险分结构、数据、控制三类。
+  </div>
+</section>
+
+<!-- ============ CHEAT SHEET ============ -->
+<section id="cheat">
+  <span class="part-tag">附录</span>
+  <h2>核心速记表（考前扫一遍）</h2>
+  <table>
+    <tr><th>考点</th><th>一句话结论</th></tr>
+    <tr><td>三种周期关系</td><td>时钟周期 ≤ 机器周期 ≤ 指令周期；现代计算机无机器周期概念</td></tr>
+    <tr><td>PC + “1”</td><td>“1” = 一条指令的长度，不是数字 1</td></tr>
+    <tr><td>指令执行六步</td><td>取指 → 译码 → 取操作数 → 执行 → 回写 → 修改 PC</td></tr>
+    <tr><td>组合逻辑</td><td>输出只取决于当前输入，不受时钟控制（加法器、MUX、ALU、译码器）</td></tr>
+    <tr><td>时序逻辑</td><td>时钟边沿写入并保持（触发器、寄存器、存储器）</td></tr>
+    <tr><td>时钟周期公式</td><td>Clk-to-Q + 最长组合逻辑延迟 + 建立时间 + 时钟偏移</td></tr>
+    <tr><td>建立/保持时间</td><td>Setup：边沿<b>前</b>输入须稳定；Hold：边沿<b>后</b>输入须稳定</td></tr>
+    <tr><td>单总线 vs 三总线</td><td>单总线一拍传一个数据、需 Y/Z 暂存器；三总线一拍完成 <code>R3←R1 op R2</code>、无需 Y/Z</td></tr>
+    <tr><td>流水线时钟周期</td><td>= 最长流水段组合逻辑延迟 + 段寄存器延迟；由瓶颈段决定</td></tr>
+    <tr><td>流水线的双面性</td><td>提高吞吐率，但单条指令延时可能因段寄存器开销而变长</td></tr>
+    <tr><td>段数越多</td><td>吞吐率越高，单条指令执行时间越长</td></tr>
+    <tr><td>三类冒险</td><td>结构（资源冲突）、数据（相关，Load-use 需 stall）、控制（分支预测）</td></tr>
+    <tr><td>流水线友好 ISA</td><td>长度一致、格式少且源寄存器位置固定、只有 load/store 访存、对齐存放</td></tr>
+    <tr><td>20%–80% 规律</td><td>简单指令占程序 80%、占 ISA 20%；复杂指令反之——RISC 的依据</td></tr>
+    <tr><td>RISC 特征</td><td>指令少/格式规整、RR 方式、流水线、大量通用寄存器、硬连线控制</td></tr>
+    <tr><td>RISC-V</td><td>开源免版税、模块化、可配置，支持 32/64 位</td></tr>
+  </table>
+
+  <div class="box note" style="margin-top:22px">
+    <span class="t">关于数值口径的提示</span>
+    本解析中的所有时间/吞吐率数字均严格来自课件并逐一复核（如单周期 600ps、流水线 250ps、插入寄存器各方案、讨论题推导）。第 56 页课件选项单位误写为 ns，实际应为 ps，文中已标注。溢出例子 0x7fffffff + 2 = 0x80000001（即 −2147483647）为按 32 位补码回绕的结果。
+  </div>
+</section>
+
+<footer>第 12 次课学习解析 · 基于《第12次课：5.1程序执行概述与数据通路 + 5.2流水线下指令的执行.pptx》整理 · 生成于 2026-11-23</footer>
+
+</main>
+</div>
+</body>
+</html>
