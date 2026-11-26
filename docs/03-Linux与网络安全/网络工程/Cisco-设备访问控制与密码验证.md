@@ -133,7 +133,7 @@ SW1(config-line)# exit
 
 - 计算机网络知识地图
 - [Cisco Packet Tracer 实验笔记](Cisco-Packet-Tracer-实验笔记.md)
-- [思科网院 · 网络概念](../../01-计算机基础/计算机网络/思科网院-网络概念.md)
+- 思科网院 · 网络概念
 - 总知识地图
 
 <!-- vault-sync: 由 D:/library/nico 自动同步，请勿在博客侧手工编辑 -->
