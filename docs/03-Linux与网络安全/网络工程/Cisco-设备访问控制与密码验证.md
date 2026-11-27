@@ -1,4 +1,4 @@
-<!-- synced-from-vault: 04-Linux与网络安全/Cisco设备访问控制与密码验证.md | updated: 2026-11-06 -->
+<!-- synced-from-vault: 04-Linux与网络安全/Cisco网络工程/Cisco设备访问控制与密码验证.md | updated: 2026-11-26 -->
 # Cisco-设备访问控制与密码验证
 
 <!-- guide-start -->
@@ -133,7 +133,7 @@ SW1(config-line)# exit
 
 - 计算机网络知识地图
 - [Cisco Packet Tracer 实验笔记](Cisco-Packet-Tracer-实验笔记.md)
-- 思科网院 · 网络概念
+- [思科网院 · 网络概念](../../01-计算机基础/计算机网络/思科网院-网络概念.md)
 - 总知识地图
 
 <!-- vault-sync: 由 D:/library/nico 自动同步，请勿在博客侧手工编辑 -->
